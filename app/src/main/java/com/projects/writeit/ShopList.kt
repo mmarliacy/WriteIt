@@ -1,7 +1,9 @@
 package com.projects.writeit
 
+import androidx.compose.runtime.mutableStateListOf
+
 object ShopList {
-     val list = listOf(
+     val products = mutableStateListOf(
         "Ananas",
         "Pomme",
         "Saucisson",
