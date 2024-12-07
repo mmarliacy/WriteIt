@@ -11,6 +11,21 @@ object ShopList {
         "Farine",
         "Lardon",
         "Pain",
-        "Riz"
+        "Levure boulangère",
+        "Pain",
+        "Huile",
+        "Frites",
+        "Pâtes",
+        "Cassoulet",
+        "Ratatouille",
+        "Biscuits",
+        "Madeleines",
+        "Café",
+        "Cappuccino",
+        "Banana",
+        "Coconut",
+        "Sauce tomato",
+        "Mayonnaise",
+
     )
 }

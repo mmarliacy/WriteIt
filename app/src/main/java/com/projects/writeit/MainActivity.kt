@@ -4,21 +4,33 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -39,16 +51,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.projects.writeit.ui.theme.WriteItTheme
 import kotlinx.coroutines.launch
-import java.util.Collections.addAll
 
 class MainActivity : ComponentActivity() {
 
@@ -59,31 +70,26 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             WriteItTheme {
-                    ShopList(
-                        list = shopList,
-                        modifier = Modifier
-                    )
+                Main(shopList, Modifier)
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    WriteItTheme {
-        ProductItem("ok", modifier = Modifier)
-    }
-}
-
-
 
 @Composable
-fun ProductItem(product: String, modifier: Modifier) {
-    Surface(modifier = modifier
-        .fillMaxWidth()
-        .padding(start = 10.dp, end = 10.dp), shadowElevation = 1.dp, shape = RoundedCornerShape(10.dp)){
-        Row (modifier.padding(20.dp)){
+fun ProductItem(deletedList: SnapshotStateList<String>, product: String, modifier: Modifier) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp)
+            .clickable {
+                deletedList.add(product)
+            },
+        shadowElevation = 1.dp,
+        shape = RoundedCornerShape(10.dp)
+    ) {
+        Row(modifier.padding(20.dp)) {
             Text(
                 text = product,
                 fontSize = 20.sp,
@@ -94,19 +100,53 @@ fun ProductItem(product: String, modifier: Modifier) {
 
 }
 
+@Composable
+fun DeleteProductItem(shopList: SnapshotStateList<String>, product: String, modifier: Modifier) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp)
+            .clickable {
+                shopList.add(product)
+            },
+        shadowElevation = 1.dp,
+        shape = RoundedCornerShape(10.dp)
+    ) {
+        Row(
+            modifier.padding(20.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = product,
+                fontSize = 20.sp,
+                modifier = modifier.padding(start = 10.dp)
+            )
 
+            Icon(
+                imageVector = Icons.Filled.AddCircle, contentDescription = "",
+                modifier = modifier.size(30.dp)
+            )
+        }
+    }
+
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShopList(list: SnapshotStateList<String>, modifier: Modifier) {
+fun Main(list: SnapshotStateList<String>, modifier: Modifier) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
-    var showBottomSheet by remember {
-    mutableStateOf(false)
+    var firstText by remember {
+        mutableStateOf("")
     }
-
+    var showBottomSheet by remember {
+        mutableStateOf(false)
+    }
+    val deletedItem = remember { mutableStateListOf<String>() }
 
     Scaffold(
+        //floatingActionButton
         floatingActionButton = {
             FloatingActionButton(
                 containerColor = Color.Black,
@@ -117,37 +157,35 @@ fun ShopList(list: SnapshotStateList<String>, modifier: Modifier) {
             ) {
                 Icon(Icons.Filled.Add, "Add floating action button")
             }
-        }
-
+        },
+        modifier = modifier.fillMaxSize()
+        //ModalBottomSheet
     ) { innerPadding ->
-        var firstText by remember {
-            mutableStateOf("")
-        }
-
-
-        if (showBottomSheet){
+        if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = {
                     showBottomSheet = false
                 },
                 sheetState = sheetState
             ) {
-                Column (
+                Column(
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier= modifier.fillMaxWidth()
-                        .padding(10.dp)
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(innerPadding)
 
-                ){
+                ) {
                     OutlinedTextField(
                         value = firstText,
-                        onValueChange = {firstText = it},
+                        onValueChange = { firstText = it },
                         textStyle = TextStyle(
                             fontStyle = FontStyle.Normal,
                             color = Color.Black
                         )
                     )
-                    Spacer(modifier = modifier.padding(20.dp)
+                    Spacer(
+                        modifier = modifier.padding(20.dp)
                     )
                     Button(
                         onClick = {
@@ -159,29 +197,58 @@ fun ShopList(list: SnapshotStateList<String>, modifier: Modifier) {
                             }
                             firstText = ""
                         }
-                    ){
+                    ) {
                         Text(
                             text = "OK",
-                            )
+                        )
                     }
-
                 }
             }
         }
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier
-                .windowInsetsPadding(WindowInsets.statusBars).fillMaxSize().padding(innerPadding)
+            modifier
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .fillMaxSize()
+                .padding(bottom = 20.dp),
+            verticalArrangement = Arrangement.Top
         ) {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                items(list) { product ->
-                    ProductItem(product, modifier)
+            Column(
+                modifier =modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.8f)
+            ){
+                LazyColumn{
+                    itemsIndexed(
+                        items = list,
+                        itemContent = { _, product ->
+                            AnimatedVisibility(
+                                visible = !deletedItem.contains(product),
+                                enter = expandVertically(),
+                                exit = shrinkVertically(animationSpec = tween(durationMillis = 1000))
+                            ) {
+                                ProductItem(deletedItem, product, modifier)
+                            }
+                        })
+                }
+            }
+            Spacer(
+                modifier = modifier.fillMaxWidth().background(Color.Black).padding(5.dp)
+            )
+            Column (
+                verticalArrangement = Arrangement.Top,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+            ){
+                LazyRow {
+                    items(deletedItem){
+                        deleteProduct ->
+                            DeleteProductItem(list,deleteProduct,Modifier)
+                    }
                 }
             }
         }
-
     }
-
 }
 
 
