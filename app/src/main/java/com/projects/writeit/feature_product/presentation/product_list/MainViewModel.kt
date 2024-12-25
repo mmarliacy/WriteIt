@@ -1,10 +1,19 @@
 package com.projects.writeit.feature_product.presentation.product_list
 
 
+import android.util.Log
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.projects.writeit.feature_product.domain.model.Category
 import com.projects.writeit.feature_product.domain.model.Product
+import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
@@ -48,7 +57,6 @@ class MainViewModel : ViewModel() {
         Category(11, "Sans catégories"),
     )
 
-
     val initialProducts: List<Product> = _initialProducts
     val deleteProducts: List<Product> = _deletedProducts
     val categories:List<Category> = _categories
@@ -66,4 +74,50 @@ class MainViewModel : ViewModel() {
         _initialProducts.add(product)
         _deletedProducts.remove(product)
     }
+
+    private var _bottomSheetStatus:Boolean = false
+    var bottomSheetStatus = mutableStateOf(_bottomSheetStatus)
+
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun OpenSheet(){
+        val sheetState = rememberModalBottomSheetState()
+        Log.d("Sheet View Model", "We are in the function")
+        LaunchedEffect(key1 = sheetState) {
+            snapshotFlow {
+                Log.d("Sheet View Model", "We are in the flow")
+                    viewModelScope.launch {
+                        Log.d("Sheet View Model", "On demande à sheet State de s'activer")
+                        sheetState.show()
+                    }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            bottomSheetStatus.value = true
+                        }
+                    }
+
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun CloseSheet(){
+        val sheetState = rememberModalBottomSheetState()
+        LaunchedEffect(key1 = sheetState) {
+            snapshotFlow {
+                viewModelScope.launch {
+                    sheetState.hide()
+                }.invokeOnCompletion {
+                    if (sheetState.isVisible) {
+                        bottomSheetStatus.value = false
+                    }
+                }
+
+            }
+        }
+    }
+
+
+
 }

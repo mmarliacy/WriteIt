@@ -4,23 +4,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFrom
-import androidx.compose.foundation.layout.paddingFromBaseline
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,14 +20,11 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -48,19 +36,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.projects.writeit.feature_product.presentation.product_list.components.ArchivedProductItem
-import com.projects.writeit.feature_product.presentation.product_list.components.CustomModalBottom
+import com.projects.writeit.feature_product.presentation.product_list.components.CustomAddDialog
 import com.projects.writeit.feature_product.presentation.product_list.components.ProductItem
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Main(mainViewModel: MainViewModel = viewModel(), modifier: Modifier) {
     val sheetState = rememberModalBottomSheetState()
-    var showBottomSheet by remember {
+
+    var showAddDialog by remember {
         mutableStateOf(false)
     }
 
@@ -77,11 +64,11 @@ fun Main(mainViewModel: MainViewModel = viewModel(), modifier: Modifier) {
                 containerColor = Color.Black,
                 contentColor = Color.White,
                 expanded = expandedFab,
-                icon = {Icon(Icons.Filled.Add, "Open Add dialog")},
-                text = {Text( text = "Ajouter")},
+                icon = { Icon(Icons.Filled.Add, "Open Add dialog") },
+                text = { Text(text = "Ajouter") },
                 modifier = Modifier.padding(bottom = 100.dp),
                 onClick = {
-                    showBottomSheet = true
+                    showAddDialog = true
                 }
             )
         },
@@ -89,25 +76,36 @@ fun Main(mainViewModel: MainViewModel = viewModel(), modifier: Modifier) {
         modifier = modifier.fillMaxSize()
         //ModalBottomSheet
     ) { innerPadding ->
-        if (showBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    showBottomSheet = false
+        if(showAddDialog) {
+            CustomAddDialog(
+                onDismissRequest = { showAddDialog = false },
+                onConfirmation = {
+                    showAddDialog = false
                 },
-                sheetState = sheetState
-            ) {
-                CustomModalBottom(
-                    viewModel = mainViewModel,
-                    modifier = Modifier.padding(innerPadding),
-                    showBottomSheet = showBottomSheet
-                )
-            }
+                viewModel = mainViewModel,
+                modifier = modifier
+            )
+/*
+        if(showBottomSheet){
+                ModalBottomSheet(
+                    onDismissRequest = {
+                        showBottomSheet = false
+                    },
+                    sheetState = sheetState
+                ) {
+                    CustomModalBottom(mainViewModel, Modifier)
+                    mainViewModel.OpenSheet()
+                }
+        }
+ */
+
         }
         Column(
             modifier
                 .windowInsetsPadding(WindowInsets.systemBars)
                 .imePadding() // padding for the bottom for the IME
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(innerPadding),
             verticalArrangement = Arrangement.Top
         ) {
             Column(
@@ -115,7 +113,7 @@ fun Main(mainViewModel: MainViewModel = viewModel(), modifier: Modifier) {
                     .fillMaxWidth()
                     .fillMaxHeight(0.9f)
             ) {
-                LazyColumn (state = listState){
+                LazyColumn(state = listState) {
                     itemsIndexed(productList) { _, product ->
                         AnimatedVisibility(
                             visible = !mainViewModel.deleteProducts.contains(product),
