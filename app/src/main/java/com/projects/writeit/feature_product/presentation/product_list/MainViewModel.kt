@@ -9,10 +9,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.projects.writeit.feature_product.domain.model.Category
 import com.projects.writeit.feature_product.domain.model.Product
+import com.projects.writeit.feature_product.presentation.product_list.components.CustomAddContent
+import com.projects.writeit.feature_product.presentation.product_list.components.ModalBottomSheetContent
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -78,6 +81,28 @@ class MainViewModel : ViewModel() {
     private var _bottomSheetStatus:Boolean = false
     var bottomSheetStatus = mutableStateOf(_bottomSheetStatus)
 
+    @Composable
+    fun DialogEvent(dialogEvent: DialogEvent, mainViewModel: MainViewModel, modifier: Modifier){
+        dialogEvent.let { event ->
+            when (event.dialogType) {
+                DialogType.CustomAddDialog -> {
+                    CustomAddContent(
+                        onDismissRequest = {},
+                        onConfirmation = {},
+                        viewModel = mainViewModel,
+                        modifier = modifier
+                    )
+                }
+
+                DialogType.CustomBottomSheetDialog -> {
+                    ModalBottomSheetContent(
+                        mainViewModel = mainViewModel
+                    )
+                }
+            }
+        }
+
+    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -87,14 +112,14 @@ class MainViewModel : ViewModel() {
         LaunchedEffect(key1 = sheetState) {
             snapshotFlow {
                 Log.d("Sheet View Model", "We are in the flow")
-                    viewModelScope.launch {
-                        Log.d("Sheet View Model", "On demande à sheet State de s'activer")
-                        sheetState.show()
-                    }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            bottomSheetStatus.value = true
-                        }
+                viewModelScope.launch {
+                    Log.d("Sheet View Model", "On demande à sheet State de s'activer")
+                    sheetState.show()
+                }.invokeOnCompletion {
+                    if (!sheetState.isVisible) {
+                       // showBottomSheet = true
                     }
+                }
 
             }
         }

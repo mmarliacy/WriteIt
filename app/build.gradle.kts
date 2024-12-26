@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.projects.writeit"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.projects.writeit"
@@ -56,6 +56,12 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.material3)
+    implementation(libs.ui)
+    implementation(libs.ui.tooling)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.material3)
+    implementation("androidx.compose.material:material:1.8.0-alpha04")
 
     //--> LifeCycle
     implementation(libs.androidx.lifecycle.viewmodel.compose)

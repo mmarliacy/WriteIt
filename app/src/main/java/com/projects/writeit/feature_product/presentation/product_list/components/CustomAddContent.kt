@@ -26,10 +26,11 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.projects.writeit.feature_product.presentation.product_list.MainViewModel
 
 @Composable
-fun CustomAddDialog(
+fun CustomAddContent(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
     viewModel: MainViewModel,
@@ -45,7 +46,11 @@ fun CustomAddDialog(
     Dialog(
         onDismissRequest = {
             onDismissRequest()
-        }) {
+        },
+        properties = DialogProperties(
+            dismissOnClickOutside = true
+        )
+    ) {
         Card(
             modifier = modifier
                 .background(Color.White)
@@ -79,9 +84,10 @@ fun CustomAddDialog(
                     modifier = modifier.fillMaxWidth()
                 )
                 CustomDropdownMenu(
-                    modifier = modifier,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    modifier = modifier
                 )
+
                 Column (
                     verticalArrangement = Arrangement.spacedBy(5.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,

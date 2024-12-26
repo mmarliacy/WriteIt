@@ -25,6 +25,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import com.projects.writeit.feature_product.presentation.product_list.DialogEvent
+import com.projects.writeit.feature_product.presentation.product_list.DialogType
 import com.projects.writeit.feature_product.presentation.product_list.MainViewModel
 
 @Composable
@@ -44,10 +46,14 @@ fun CustomDropdownMenu(viewModel: MainViewModel, modifier: Modifier) {
     } else {
         remember { Icons.Filled.KeyboardArrowDown}
     }
+    val showBottomSheet by remember {
+        mutableStateOf(viewModel.bottomSheetStatus)
+    }
 
     Column (
         modifier = modifier.padding(start = 20.dp, end = 20.dp)
     ){
+
         OutlinedTextField(
             value = selectedItem,
             onValueChange = { selectedItem = it },
@@ -62,8 +68,7 @@ fun CustomDropdownMenu(viewModel: MainViewModel, modifier: Modifier) {
             },
             trailingIcon = {
                 Icon(icon, "", Modifier.clickable {
-                    expanded = !expanded
-                    Log.d("Arrow status", "I'm OK'")
+                        showBottomSheet.value = true
                 })
             }
         )
