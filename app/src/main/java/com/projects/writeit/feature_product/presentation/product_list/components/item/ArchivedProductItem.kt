@@ -1,10 +1,11 @@
-package com.projects.writeit.feature_product.presentation.product_list.components
+package com.projects.writeit.feature_product.presentation.product_list.components.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,24 +25,36 @@ import com.projects.writeit.feature_product.domain.model.Product
 import com.projects.writeit.feature_product.presentation.product_list.MainViewModel
 
 @Composable
-fun ProductItem(mainViewModel: MainViewModel = viewModel(), product: Product) {
+fun ArchivedProductItem(mainViewModel: MainViewModel = viewModel(), product: Product) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp)
-            .clickable {
-                mainViewModel.deleteProduct(product)
-            },
+            .background(Color.White)
+            .padding(5.dp),
         shadowElevation = 1.dp,
         shape = RoundedCornerShape(10.dp)
     ) {
-        Row(Modifier.padding(20.dp)) {
+        Row(
+            Modifier.background(Color.DarkGray).padding(10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 text = product.name,
                 fontSize = 20.sp,
+                color = Color.White,
                 modifier = Modifier.padding(start = 10.dp)
+            )
+
+            Icon(
+                imageVector = Icons.Filled.AddCircle,
+                contentDescription = "",
+                modifier = Modifier.size(35.dp).clickable {
+                    mainViewModel.cancelDeletion(product)
+                },
+                tint = Color.White
             )
         }
     }
-}
 
+}

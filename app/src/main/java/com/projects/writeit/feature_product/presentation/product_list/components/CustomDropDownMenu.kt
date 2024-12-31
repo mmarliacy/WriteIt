@@ -1,6 +1,5 @@
 package com.projects.writeit.feature_product.presentation.product_list.components
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,8 +24,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import com.projects.writeit.feature_product.presentation.product_list.DialogEvent
-import com.projects.writeit.feature_product.presentation.product_list.DialogType
 import com.projects.writeit.feature_product.presentation.product_list.MainViewModel
 
 @Composable

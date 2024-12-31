@@ -2,7 +2,6 @@ package com.projects.writeit.feature_product.presentation.product_list.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,15 +16,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.projects.writeit.feature_product.domain.model.Category
 import com.projects.writeit.feature_product.presentation.product_list.MainViewModel
+import com.projects.writeit.ui.theme.latoFamily
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ModalBottomSheetContent(mainViewModel: MainViewModel){
+fun ModalBottomSheet(mainViewModel: MainViewModel){
     val sheetState = rememberModalBottomSheetState()
     val showBottomSheet by remember {
         mutableStateOf(mainViewModel.bottomSheetStatus)
@@ -68,19 +71,34 @@ fun CustomBottomSheetContent(
 
 @Composable
 fun CategoryItem(category: Category) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.Start
+    ){
         Text(
-            text = category.name
+            text = category.name,
+            fontFamily = latoFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = 18.sp,
+            modifier = Modifier.padding(start = 10.dp)
         )
         HorizontalDivider(
-            thickness = 0.5.dp,
-            color = Color.LightGray
+            thickness = 1.dp,
+            color = Color.LightGray,
+            modifier = Modifier.padding(
+                top = 15.dp,
+                bottom = 15.dp,
+                start = 10.dp,
+                end = 10.dp
+            )
         )
     }
 }
 
+@Preview
+@Composable
+fun GetAnImage(){
+    CategoryItem(category = Category(1, "Beauty"))
+}
 
 
