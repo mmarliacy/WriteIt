@@ -4,8 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,39 +20,42 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.projects.writeit.feature_product.domain.model.Product
 import com.projects.writeit.feature_product.presentation.product_list.MainViewModel
 
 @Composable
-fun ArchivedProductItem(mainViewModel: MainViewModel = viewModel(), product: Product) {
+fun ArchivedProductItem(mainViewModel: MainViewModel, product: Product) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
             .padding(5.dp),
         shadowElevation = 1.dp,
         shape = RoundedCornerShape(10.dp)
     ) {
         Row(
-            Modifier.background(Color.DarkGray).padding(10.dp),
+            Modifier
+                .background(Color.White)
+                .padding(10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = product.name,
                 fontSize = 20.sp,
-                color = Color.White,
+                color = Color.Black,
                 modifier = Modifier.padding(start = 10.dp)
             )
-
             Icon(
                 imageVector = Icons.Filled.AddCircle,
                 contentDescription = "",
-                modifier = Modifier.size(35.dp).clickable {
-                    mainViewModel.cancelDeletion(product)
-                },
-                tint = Color.White
+                modifier = Modifier
+                    .size(35.dp)
+                    .clickable {
+                        mainViewModel.cancelDeletion(product)
+                        // Animate scroll to the first item
+
+                    },
+                tint = Color.Black
             )
         }
     }

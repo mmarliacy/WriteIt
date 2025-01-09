@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.projects.writeit.feature_product.presentation.product_list.Main
 import com.projects.writeit.feature_product.presentation.product_list.MainViewModel
-import com.projects.writeit.ui.theme.WriteItTheme
+import com.projects.writeit.ui.theme.WriteItCustomTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -22,20 +22,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            WriteItTheme {
+            WriteItCustomTheme{
                 Main(viewModel, modifier = Modifier)
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun Preview(){
-    val viewModel by remember {
-        mutableStateOf(MainViewModel())
-    }
-Main(viewModel,modifier = Modifier)
 }
 
 

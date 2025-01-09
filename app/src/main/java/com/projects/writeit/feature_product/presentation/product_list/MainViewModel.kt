@@ -37,6 +37,7 @@ class MainViewModel : ViewModel() {
 
     var bottomSheetStatus = mutableStateOf(false)
     var addDialogStatus = mutableStateOf(false)
+    val categorySelected = mutableStateOf("")
 
 
     @Composable

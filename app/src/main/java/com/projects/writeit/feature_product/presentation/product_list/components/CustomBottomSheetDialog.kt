@@ -1,5 +1,6 @@
 package com.projects.writeit.feature_product.presentation.product_list.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,6 +54,10 @@ fun CustomBottomSheetContent(
 ) {
     val categoryList = viewModel.categories
 
+    val categorySelected by remember {
+        mutableStateOf(viewModel.categorySelected)
+    }
+
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -63,17 +67,24 @@ fun CustomBottomSheetContent(
     ) {
         categoryList.forEach { category ->
             CategoryItem(
-                category
+                category,
+                onClick =
+                {
+                    categorySelected.value = category.name
+                }
             )
         }
     }
 }
 
 @Composable
-fun CategoryItem(category: Category) {
+fun CategoryItem(category: Category, onClick: () -> Unit) {
     Column(
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.Start,
+        modifier = Modifier.clickable {
+            onClick()
+        }
     ){
         Text(
             text = category.name,
@@ -95,10 +106,5 @@ fun CategoryItem(category: Category) {
     }
 }
 
-@Preview
-@Composable
-fun GetAnImage(){
-    CategoryItem(category = Category(1, "Beauty"))
-}
 
 

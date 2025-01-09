@@ -46,14 +46,16 @@ fun CustomDropdownMenu(viewModel: MainViewModel, modifier: Modifier) {
     val showBottomSheet by remember {
         mutableStateOf(viewModel.bottomSheetStatus)
     }
+    val categorySelected by remember {
+        mutableStateOf(viewModel.categorySelected)
+    }
 
     Column (
         modifier = modifier.padding(start = 20.dp, end = 20.dp)
     ){
-
         OutlinedTextField(
             value = selectedItem,
-            onValueChange = { selectedItem = it },
+            onValueChange = { selectedItem = categorySelected.value },
             modifier = modifier
                 .fillMaxWidth()
                 .onGloballyPositioned { coordinates ->

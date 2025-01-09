@@ -1,6 +1,4 @@
 package com.projects.writeit.ui.theme
-
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -12,29 +10,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = primaryColor,
+    secondary = lightPrimaryColor,
+    tertiary = lightAccentColor,
+    background = darkBackground,
+    surface = surface,
+    onPrimary = darkPrimaryColor,
+    onSecondary = darkPrimaryColor,
+    onTertiary = darkPrimaryColor,
+    onBackground = blackColor,
+    onSurface = surface,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = accentColor,
+    secondary = darkPrimaryColor,
+    tertiary = darkAccentColor,
+    background = blackColor,
+    surface = whiteColor,
+    onPrimary = whiteColor,
+    onSecondary = whiteColor,
+    onTertiary = whiteColor,
+    onBackground = lightBackground,
+    onSurface = surface,
 )
 
 @Composable
-fun WriteItTheme(
+fun WriteItCustomTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
