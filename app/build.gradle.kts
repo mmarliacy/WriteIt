@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 android {
@@ -76,4 +77,28 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test)
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    // Compose dependencies
+    implementation(libs.androidx.lifecycle.viewmodel.compose.v240beta01)
+    implementation(libs.kotlin.gradle.plugin)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+
+    //Dagger - Hilt
+    implementation(libs.hilt.android.v249)
+    ksp(libs.hilt.android.compiler)
+    implementation (libs.androidx.hilt.lifecycle.viewmodel)
+    ksp(libs.androidx.hilt.compiler)
+
+    // Room
+    implementation (libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler.v230)
+
+    // Kotlin Extensions and Coroutines support for Room
+    implementation (libs.androidx.room.ktx)
 }
