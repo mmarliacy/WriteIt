@@ -38,7 +38,7 @@ android {
         compose = true
     }
 }
-
+// New implementation
 dependencies {
     //--> Foundation
     implementation(libs.androidx.foundation)
@@ -64,7 +64,6 @@ dependencies {
     implementation(libs.androidx.material)
 
     //--> LifeCycle
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
     //--> Tests & Debug
