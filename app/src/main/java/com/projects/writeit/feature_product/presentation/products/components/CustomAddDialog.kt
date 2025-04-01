@@ -1,4 +1,4 @@
-package com.projects.writeit.feature_product.presentation.product_list.components
+package com.projects.writeit.feature_product.presentation.products.components
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.projects.writeit.feature_product.domain.model.Product
-import com.projects.writeit.feature_product.presentation.product_list.MainViewModel
+import com.projects.writeit.feature_product.presentation.products.MainViewModel
 import com.projects.writeit.ui.theme.latoFamily
 import kotlin.random.Random
 
@@ -142,7 +142,7 @@ fun CustomAddContent(
                                         Product(
                                             id = Random.nextInt(),
                                             name = productName,
-                                            quantity = productQuantity.toInt()
+                                            timestamp = System.currentTimeMillis()
                                         )
                                     )
                                     onConfirmation()

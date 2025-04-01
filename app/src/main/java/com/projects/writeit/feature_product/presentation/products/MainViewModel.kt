@@ -1,38 +1,36 @@
-package com.projects.writeit.feature_product.presentation.product_list
+package com.projects.writeit.feature_product.presentation.products
 
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
-import com.projects.writeit.feature_product.domain.model.Category
 import com.projects.writeit.feature_product.domain.model.Product
-import com.projects.writeit.feature_product.presentation.product_list.components.CustomAddContent
-import com.projects.writeit.feature_product.presentation.product_list.components.ModalBottomSheet
+import com.projects.writeit.feature_product.presentation.products.components.CustomAddContent
+import com.projects.writeit.feature_product.presentation.products.components.ModalBottomSheet
 import com.projects.writeit.feature_product.presentation.util.DialogEvent
 import com.projects.writeit.feature_product.presentation.util.DialogType
-import com.projects.writeit.feature_product.presentation.util.Lists._categories
-import com.projects.writeit.feature_product.presentation.util.Lists._deletedProducts
-import com.projects.writeit.feature_product.presentation.util.Lists._initialProducts
+import com.projects.writeit.feature_product.presentation.util.Lists
+import com.projects.writeit.feature_product.presentation.util.Lists.deletedProducts
 
 class MainViewModel : ViewModel() {
 
-    val initialProducts: List<Product> = _initialProducts
-    val deleteProducts: List<Product> = _deletedProducts
-    val categories: List<Category> = _categories
+    val initialProducts: List<Product> = Lists.initialProducts
+    val deleteProducts: List<Product> = deletedProducts
+    val categories: List<String> = Product.categories
 
     fun addNewProduct(product: Product) {
-        _initialProducts.add(product)
+        Lists.initialProducts.add(product)
     }
 
     fun deleteProduct(product: Product) {
-        _deletedProducts.add(product)
-        _initialProducts.remove(product)
+        deletedProducts.add(product)
+        Lists.initialProducts.remove(product)
     }
 
     fun cancelDeletion(product: Product) {
-        _initialProducts.add(product)
-        _deletedProducts.remove(product)
+        Lists.initialProducts.add(product)
+        deletedProducts.remove(product)
     }
 
     var bottomSheetStatus = mutableStateOf(false)

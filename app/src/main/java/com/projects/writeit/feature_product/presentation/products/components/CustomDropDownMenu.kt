@@ -1,4 +1,4 @@
-package com.projects.writeit.feature_product.presentation.product_list.components
+package com.projects.writeit.feature_product.presentation.products.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -24,7 +24,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import com.projects.writeit.feature_product.presentation.product_list.MainViewModel
+import com.projects.writeit.feature_product.presentation.products.MainViewModel
 
 @Composable
 fun CustomDropdownMenu(viewModel: MainViewModel, modifier: Modifier) {
@@ -87,11 +87,11 @@ fun CustomDropdownMenu(viewModel: MainViewModel, modifier: Modifier) {
             categoryList.forEach {
                 DropdownMenuItem(
                     onClick = {
-                        selectedItem = it.name
+                        selectedItem = it
                         expanded = false
                     },
                     text = {
-                        Text(text = it.name)
+                        Text(text = it)
                     }
                 )
             }

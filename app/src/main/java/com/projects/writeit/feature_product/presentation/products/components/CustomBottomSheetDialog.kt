@@ -1,4 +1,4 @@
-package com.projects.writeit.feature_product.presentation.product_list.components
+package com.projects.writeit.feature_product.presentation.products.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,8 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.projects.writeit.feature_product.domain.model.Category
-import com.projects.writeit.feature_product.presentation.product_list.MainViewModel
+import com.projects.writeit.feature_product.presentation.products.MainViewModel
 import com.projects.writeit.ui.theme.latoFamily
 
 
@@ -70,7 +69,7 @@ fun CustomBottomSheetContent(
                 category,
                 onClick =
                 {
-                    categorySelected.value = category.name
+                    categorySelected.value = category
                 }
             )
         }
@@ -78,7 +77,7 @@ fun CustomBottomSheetContent(
 }
 
 @Composable
-fun CategoryItem(category: Category, onClick: () -> Unit) {
+fun CategoryItem(category: String, onClick: () -> Unit) {
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start,
@@ -87,7 +86,7 @@ fun CategoryItem(category: Category, onClick: () -> Unit) {
         }
     ){
         Text(
-            text = category.name,
+            text = category,
             fontFamily = latoFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 18.sp,

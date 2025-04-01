@@ -2,8 +2,6 @@
 <resources>
 
     <style name="Theme.WriteIt" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:colorPrimary">@color/primaryColor</item>
-        <item name="android:colorAccent">@color/accentColor</item>
     </style>
         
 </resources>

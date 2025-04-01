@@ -1,4 +1,4 @@
-package com.projects.writeit.feature_product.presentation.product_list
+package com.projects.writeit.feature_product.presentation.products
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,7 +22,6 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -44,18 +42,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.projects.writeit.feature_product.presentation.product_list.components.ModalBottomSheet
-import com.projects.writeit.feature_product.presentation.product_list.components.lists.ArchivedList
-import com.projects.writeit.feature_product.presentation.product_list.components.lists.ShopList
-import com.projects.writeit.feature_product.presentation.product_list.components.tabs.Tabs
+import com.projects.writeit.feature_product.presentation.products.components.ModalBottomSheet
+import com.projects.writeit.feature_product.presentation.products.components.lists.ArchivedList
+import com.projects.writeit.feature_product.presentation.products.components.lists.ShopList
+import com.projects.writeit.feature_product.presentation.products.components.tabs.Tabs
 import com.projects.writeit.feature_product.presentation.util.DialogEvent
 import com.projects.writeit.feature_product.presentation.util.DialogType
-import com.projects.writeit.ui.theme.PurpleGrey80
 import com.projects.writeit.ui.theme.accentColor
 import com.projects.writeit.ui.theme.blackColor
 import com.projects.writeit.ui.theme.latoFamily
 import com.projects.writeit.ui.theme.secondaryText
-import com.projects.writeit.ui.theme.surface
 import com.projects.writeit.ui.theme.whiteColor
 import kotlinx.coroutines.launch
 
@@ -98,16 +94,8 @@ fun Main(mainViewModel: MainViewModel = viewModel(), modifier: Modifier) {
                                 color = whiteColor,
                                 fontFamily = latoFamily,
                                 fontWeight = FontWeight.Black,
-                                fontSize = 20.sp
+                                fontSize = 16.sp
                             )
-                        },
-                        navigationIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.Menu,
-                                contentDescription = "navigationIcon",
-                                tint = whiteColor,
-                                modifier = Modifier.padding(start = 5.dp).size(25.dp)
-                                )
                         },
                         backgroundColor = blackColor
                     )
@@ -142,7 +130,7 @@ fun Main(mainViewModel: MainViewModel = viewModel(), modifier: Modifier) {
                     TabRow(
                         selectedTabIndex = selectedPageIndex.value,
                         backgroundColor = whiteColor,
-                        modifier = Modifier.fillMaxWidth(0.5f)
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Tabs.entries.forEachIndexed { index, currentTab ->
                             Tab(
@@ -155,7 +143,9 @@ fun Main(mainViewModel: MainViewModel = viewModel(), modifier: Modifier) {
                                     }
                                 },
                                 text = {
-                                    Text(text = currentTab.tabName)
+                                    Text(
+                                        text = currentTab.tabName,
+                                        fontSize = 16.sp)
                                 }
                             )
                         }

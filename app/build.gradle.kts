@@ -43,6 +43,7 @@ dependencies {
     //--> Foundation
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.ktx)
 
     //--> Compose BOM with a version definition - Nomenclature
     val composeBom = platform(libs.androidx.compose.bom)
@@ -79,7 +80,6 @@ dependencies {
 
     // Compose dependencies
     implementation(libs.androidx.lifecycle.viewmodel.compose.v240beta01)
-    implementation(libs.kotlin.gradle.plugin)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.hilt.navigation.compose)
@@ -97,6 +97,7 @@ dependencies {
     // Room
     implementation (libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler.v230)
+    ksp(libs.moshi.kotlin.codegen)
 
     // Kotlin Extensions and Coroutines support for Room
     implementation (libs.androidx.room.ktx)

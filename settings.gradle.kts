@@ -10,14 +10,15 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
-}
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
+    @Suppress("UnstableApiUsage")
+    dependencyResolutionManagement {
+        repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+        repositories {
+            google()
+            mavenCentral()
+        }
     }
 }
+    rootProject.name = "WriteIt"
+    include(":app")
 
-rootProject.name = "WriteIt"
-include(":app")
