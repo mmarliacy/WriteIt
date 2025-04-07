@@ -30,3 +30,5 @@ data class Product (
         )
     }
 }
+
+class InvalidProductException(message: String): Exception(message)

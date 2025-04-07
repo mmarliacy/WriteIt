@@ -42,7 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.projects.writeit.feature_product.presentation.products.components.ModalBottomSheet
+import com.projects.writeit.feature_product.presentation.add_edit_product.components.ModalBottomSheet
 import com.projects.writeit.feature_product.presentation.products.components.lists.ArchivedList
 import com.projects.writeit.feature_product.presentation.products.components.lists.ShopList
 import com.projects.writeit.feature_product.presentation.products.components.tabs.Tabs

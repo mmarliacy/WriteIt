@@ -1,4 +1,4 @@
-package com.projects.writeit.feature_product.presentation.products.components
+package com.projects.writeit.feature_product.presentation.add_edit_product.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

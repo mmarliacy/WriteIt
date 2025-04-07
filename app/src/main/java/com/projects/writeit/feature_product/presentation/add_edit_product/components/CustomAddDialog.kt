@@ -1,4 +1,4 @@
-package com.projects.writeit.feature_product.presentation.products.components
+package com.projects.writeit.feature_product.presentation.add_edit_product.components
 
 import android.widget.Toast
 import androidx.compose.foundation.background

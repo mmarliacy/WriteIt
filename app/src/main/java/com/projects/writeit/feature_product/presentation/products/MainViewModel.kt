@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import com.projects.writeit.feature_product.domain.model.Product
-import com.projects.writeit.feature_product.presentation.products.components.CustomAddContent
-import com.projects.writeit.feature_product.presentation.products.components.ModalBottomSheet
+import com.projects.writeit.feature_product.presentation.add_edit_product.components.CustomAddContent
+import com.projects.writeit.feature_product.presentation.add_edit_product.components.ModalBottomSheet
 import com.projects.writeit.feature_product.presentation.util.DialogEvent
 import com.projects.writeit.feature_product.presentation.util.DialogType
 import com.projects.writeit.feature_product.presentation.util.Lists

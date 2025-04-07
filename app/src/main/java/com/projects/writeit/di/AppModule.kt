@@ -6,6 +6,7 @@ import androidx.room.RoomDatabase
 import com.projects.writeit.feature_product.data.data_source.ProductDatabase
 import com.projects.writeit.feature_product.data.repository.ProductRepositoryImpl
 import com.projects.writeit.feature_product.domain.repository.ProductRepository
+import com.projects.writeit.feature_product.domain.use_case.AddProduct
 import com.projects.writeit.feature_product.domain.use_case.DeleteProduct
 import com.projects.writeit.feature_product.domain.use_case.GetProducts
 import com.projects.writeit.feature_product.domain.use_case.ProductUseCases
@@ -40,7 +41,8 @@ object AppModule {
     fun providesProductUseCases(repository: ProductRepository): ProductUseCases {
         return ProductUseCases(
             getProducts = GetProducts(repository),
-            deleteProduct = DeleteProduct(repository)
+            deleteProduct = DeleteProduct(repository),
+            addProduct = AddProduct(repository)
         )
     }
 }
