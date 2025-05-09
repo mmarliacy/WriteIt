@@ -1,17 +1,17 @@
-package com.projects.writeit.feature_product.presentation.products
+package com.projects.writeit.feature_product.presentation.list_product
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.projects.writeit.feature_product.domain.model.Product
 import com.projects.writeit.feature_product.domain.use_case.ProductUseCases
 import com.projects.writeit.feature_product.domain.util.OrderType
 import com.projects.writeit.feature_product.domain.util.ProductOrder
+import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
+import com.projects.writeit.feature_product.presentation.list_product.util.ProductsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -49,12 +49,11 @@ class ProductsViewModel @Inject constructor(
                     productUseCases.deleteProduct(event.product)
                     recentlyDeletedProduct = event.product
                 }
-
             }
 
             is ProductsEvent.RestoreProduct -> {
                 viewModelScope.launch {
-                    productUseCases.addProduct(recentlyDeletedProduct ?: return@launch)
+                    productUseCases.addProduct(recentlyDeletedProduct ?: return@launch )
                     recentlyDeletedProduct = null
                 }
             }

@@ -1,4 +1,4 @@
-package com.projects.writeit.feature_product.presentation.add_edit_product.components
+package com.projects.writeit.feature_product.presentation.add_edit_product.old_components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.projects.writeit.feature_product.presentation.products.MainViewModel
+import com.projects.writeit.feature_product.presentation.MainViewModel
 import com.projects.writeit.ui.theme.latoFamily
 
 

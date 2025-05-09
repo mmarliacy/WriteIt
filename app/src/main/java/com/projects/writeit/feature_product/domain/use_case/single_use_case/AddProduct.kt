@@ -1,4 +1,4 @@
-package com.projects.writeit.feature_product.domain.use_case
+package com.projects.writeit.feature_product.domain.use_case.single_use_case
 
 import com.projects.writeit.feature_product.domain.model.InvalidProductException
 import com.projects.writeit.feature_product.domain.model.Product

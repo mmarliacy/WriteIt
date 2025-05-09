@@ -1,4 +1,4 @@
-package com.projects.writeit.feature_product.presentation.products.components.lists
+package com.projects.writeit.feature_product.presentation.list_product.components.lists
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -12,22 +12,22 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.projects.writeit.feature_product.presentation.products.MainViewModel
-import com.projects.writeit.feature_product.presentation.products.components.item.ArchivedProductItem
+import com.projects.writeit.feature_product.presentation.MainViewModel
+import com.projects.writeit.feature_product.presentation.list_product.ProductsViewModel
+import com.projects.writeit.feature_product.presentation.list_product.components.item.ArchivedProductItem
 
 @Composable
-fun ArchivedList(mainViewModel: MainViewModel) {
+fun ArchivedList(viewModel: ProductsViewModel) {
+    val state = viewModel.state.value
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         itemsIndexed(
-            items = mainViewModel.deleteProducts,
+            items = state.deleteProducts,
             itemContent = { _, deleteProduct ->
                 AnimatedVisibility(
-                    visible = !mainViewModel.initialProducts.contains(
-                        deleteProduct
-                    ),
+                    visible = state.isDeletedProductIsVisible,
                     enter = expandVertically(),
                     exit = shrinkVertically(animationSpec = tween(durationMillis = 1000))
                 ) {
@@ -36,8 +36,10 @@ fun ArchivedList(mainViewModel: MainViewModel) {
                             .fillMaxSize()
                     ) {
                         ArchivedProductItem(
-                            mainViewModel,
-                            deleteProduct
+                            deleteProduct,
+                            {
+
+                            }
                         )
                     }
 

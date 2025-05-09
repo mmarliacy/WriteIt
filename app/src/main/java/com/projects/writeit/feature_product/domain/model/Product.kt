@@ -8,7 +8,7 @@ data class Product (
     @PrimaryKey
     val id :Int? = null,
     val name: String,
-    val quantity:Int? = null,
+    val quantity:Int,
     val price : Double? = null,
     val category: String? = null,
     val timestamp: Long

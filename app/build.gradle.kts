@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.android.daggerhilt)
 }
 
 android {
@@ -16,6 +17,7 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -38,12 +40,13 @@ android {
         compose = true
     }
 }
-// New implementation
-dependencies {
+    // New implementation
+    dependencies {
     //--> Foundation
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.multidex)
 
     //--> Compose BOM with a version definition - Nomenclature
     val composeBom = platform(libs.androidx.compose.bom)
@@ -64,6 +67,7 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.androidx.material)
 
+
     //--> LifeCycle
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
@@ -82,22 +86,20 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose.v240beta01)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.hilt.navigation.compose)
+
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
     //Dagger - Hilt
-    implementation(libs.hilt.android.v249)
+    implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
-    implementation (libs.androidx.hilt.lifecycle.viewmodel)
-    ksp(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     // Room
     implementation (libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler.v230)
-    ksp(libs.moshi.kotlin.codegen)
 
     // Kotlin Extensions and Coroutines support for Room
     implementation (libs.androidx.room.ktx)

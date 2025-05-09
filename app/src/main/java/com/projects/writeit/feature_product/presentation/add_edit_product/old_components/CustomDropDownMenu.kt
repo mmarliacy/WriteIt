@@ -1,4 +1,4 @@
-package com.projects.writeit.feature_product.presentation.add_edit_product.components
+package com.projects.writeit.feature_product.presentation.add_edit_product.old_components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -24,7 +24,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import com.projects.writeit.feature_product.presentation.products.MainViewModel
+import com.projects.writeit.feature_product.presentation.MainViewModel
 
 @Composable
 fun CustomDropdownMenu(viewModel: MainViewModel, modifier: Modifier) {

@@ -2,14 +2,14 @@ package com.projects.writeit.di
 
 import android.app.Application
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import com.projects.writeit.feature_product.data.data_source.ProductDatabase
 import com.projects.writeit.feature_product.data.repository.ProductRepositoryImpl
 import com.projects.writeit.feature_product.domain.repository.ProductRepository
-import com.projects.writeit.feature_product.domain.use_case.AddProduct
-import com.projects.writeit.feature_product.domain.use_case.DeleteProduct
-import com.projects.writeit.feature_product.domain.use_case.GetProducts
+import com.projects.writeit.feature_product.domain.use_case.single_use_case.AddProduct
+import com.projects.writeit.feature_product.domain.use_case.single_use_case.DeleteProduct
+import com.projects.writeit.feature_product.domain.use_case.single_use_case.GetProducts
 import com.projects.writeit.feature_product.domain.use_case.ProductUseCases
+import com.projects.writeit.feature_product.domain.use_case.single_use_case.GetProduct
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,7 +42,8 @@ object AppModule {
         return ProductUseCases(
             getProducts = GetProducts(repository),
             deleteProduct = DeleteProduct(repository),
-            addProduct = AddProduct(repository)
+            addProduct = AddProduct(repository),
+            getProduct = GetProduct(repository)
         )
     }
 }
