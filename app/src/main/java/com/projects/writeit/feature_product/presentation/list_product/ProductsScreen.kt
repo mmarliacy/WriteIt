@@ -55,12 +55,7 @@ fun ProductsScreen(
 ) {
 
     val scaffoldState = rememberScaffoldState()
-    val state = viewModel.state
     val pagerState = rememberPagerState(pageCount = { TabItem.entries.size })
-    val scope = rememberCoroutineScope()
-    val selectedPageIndex = remember {
-        derivedStateOf { pagerState.currentPage }
-    }
 
     val initialListState = rememberLazyListState()
     val expandedFab by remember { derivedStateOf { initialListState.firstVisibleItemIndex != 0 } }
@@ -107,25 +102,18 @@ fun ProductsScreen(
                     .padding(top = it.calculateTopPadding())
                     .background(whiteColor)
             ) {
-                CustomTabRow(
-                    selectedPageIndex = selectedPageIndex.value,
-                    onTabSelected = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(selectedPageIndex.value)
-                        }
-                    }
-                )
+                CustomTabRow(pagerState = pagerState)
 
                 CustomHorizontalPager(
                     viewModel,
-                    scaffoldState
+                    scaffoldState,
+                    pagerState
                 )
 
                 ShopList(
                     viewModel = viewModel,
                     scaffoldState = scaffoldState
                 )
-
             }
         }
     }

@@ -29,22 +29,12 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(
                         navController = navController,
-                        startDestination = Screen.ProductsScreen.route
+                        startDestination = Screen.ProductsScreen
                     ) {
-                        composable(route = Screen.ProductsScreen.route) {
+                        composable<Screen.ProductsScreen> {
                             ProductsScreen(navController = navController)
                         }
-                        composable(
-                            route = Screen.AddEditProductScreen.route + "?productId={productId}",
-                            arguments = listOf(
-                                navArgument(
-                                    name = "productId"
-                                ) {
-                                    type = NavType.IntType
-                                    defaultValue = -1
-                                }
-                            )
-                        ) {
+                        composable<Screen.AddEditProductScreen> {
                             AddEditScreen(
                                 navController = navController
                             )

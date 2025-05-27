@@ -32,6 +32,9 @@ import com.projects.writeit.feature_product.presentation.add_edit_product.util.A
 import com.projects.writeit.ui.theme.whiteColor
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
+
 
 @Composable
 fun AddEditScreen(

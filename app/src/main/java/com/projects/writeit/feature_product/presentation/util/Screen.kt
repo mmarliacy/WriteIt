@@ -1,8 +1,11 @@
 package com.projects.writeit.feature_product.presentation.util
 
-sealed class Screen (
-    val route : String
-){
-    object ProductsScreen: Screen("products_screen")
-    object AddEditProductScreen : Screen("add_edit_product_screen")
+import kotlinx.serialization.Serializable
+
+@Serializable
+sealed class Screen {
+    @Serializable
+    data object ProductsScreen: Screen()
+    @Serializable
+    data object AddEditProductScreen : Screen()
 }

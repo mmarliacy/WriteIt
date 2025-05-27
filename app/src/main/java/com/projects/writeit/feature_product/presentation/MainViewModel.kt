@@ -19,17 +19,17 @@ class MainViewModel{
     val categories: List<String> = Product.categories
 
     fun addNewProduct(product: Product) {
-        Lists.initialProducts.add(product)
+        //Lists.initialProducts.add(product)
     }
 
     fun deleteProduct(product: Product) {
-        deletedProducts.add(product)
-        Lists.initialProducts.remove(product)
+        // deletedProducts.add(product)
+        //  Lists.initialProducts.remove(product)
     }
 
     fun cancelDeletion(product: Product) {
-        Lists.initialProducts.add(product)
-        deletedProducts.remove(product)
+       // Lists.initialProducts.add(product)
+        // deletedProducts.remove(product)
     }
 
     var bottomSheetStatus = mutableStateOf(false)

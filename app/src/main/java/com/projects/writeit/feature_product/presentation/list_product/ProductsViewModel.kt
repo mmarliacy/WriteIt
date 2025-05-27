@@ -1,5 +1,6 @@
 package com.projects.writeit.feature_product.presentation.list_product
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -30,7 +31,8 @@ class ProductsViewModel @Inject constructor(
     private var getProductsJob: Job? = null
 
     init {
-        getProducts(productOrder = ProductOrder.Date(OrderType.AscendingOrder))
+        // getProducts(productOrder = ProductOrder.Date(OrderType.AscendingOrder))
+        Log.i("Init", "There is ${state.value.products.size} products in database")
     }
 
     fun onEvent(event: ProductsEvent) {

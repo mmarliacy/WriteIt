@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.android.daggerhilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -12,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.projects.writeit"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -40,13 +41,14 @@ android {
         compose = true
     }
 }
-    // New implementation
-    dependencies {
+// New implementation
+dependencies {
     //--> Foundation
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.multidex)
+    implementation(libs.androidx.compose.material3)
 
     //--> Compose BOM with a version definition - Nomenclature
     val composeBom = platform(libs.androidx.compose.bom)
@@ -84,9 +86,11 @@ android {
 
     // Compose dependencies
     implementation(libs.androidx.lifecycle.viewmodel.compose.v240beta01)
-    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.extended)
 
+    // Navigation Compose
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
@@ -98,9 +102,9 @@ android {
     implementation(libs.androidx.hilt.navigation.compose)
 
     // Room
-    implementation (libs.androidx.room.runtime)
+    implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler.v230)
 
     // Kotlin Extensions and Coroutines support for Room
-    implementation (libs.androidx.room.ktx)
+    implementation(libs.androidx.room.ktx)
 }
