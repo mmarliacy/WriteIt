@@ -34,7 +34,7 @@ class ProductsViewModel @Inject constructor(
         // getProducts(productOrder = ProductOrder.Date(OrderType.AscendingOrder))
         Log.i("Init", "There is ${state.value.products.size} products in database")
     }
-
+    
     fun onEvent(event: ProductsEvent) {
         when (event) {
             is ProductsEvent.Order -> {

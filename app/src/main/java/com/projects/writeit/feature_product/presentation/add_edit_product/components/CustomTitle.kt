@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import com.projects.writeit.ui.theme.latoFamily
 
@@ -18,6 +19,7 @@ fun CustomTitle(
     size: TextUnit,
     fontStyle: FontStyle,
     textStyle: TextStyle? = null,
+    fontWeight: FontWeight,
     modifier: Modifier = Modifier
 ){
     Box(
@@ -26,6 +28,7 @@ fun CustomTitle(
         Text(
             text = title,
             fontFamily = fontFamily,
+            fontWeight = fontWeight,
             fontSize = size,
             fontStyle = fontStyle
         )
