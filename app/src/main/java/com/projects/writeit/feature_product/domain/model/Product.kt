@@ -11,9 +11,10 @@ data class Product (
     val id :Int? = null,
     val name: String,
     val quantity:Int,
-    val price : Double? = null,
+    val price : Double,
     val category: String? = null,
-    val timestamp: Long
+    val timestamp: Long,
+    val isArchived: Boolean = false
 ){
     companion object {
         val categories = listOf(

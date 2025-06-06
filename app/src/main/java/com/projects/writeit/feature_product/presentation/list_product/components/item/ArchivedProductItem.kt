@@ -19,8 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.projects.writeit.feature_product.domain.model.Product
-import com.projects.writeit.feature_product.presentation.MainViewModel
-import com.projects.writeit.ui.theme.accentColor
+import com.projects.writeit.ui.theme.blackColor
 import com.projects.writeit.ui.theme.latoFamily
 import com.projects.writeit.ui.theme.surfaceLight
 
@@ -57,7 +56,7 @@ fun ArchivedProductItem(
                     .clickable {
                         onRestoreClick()
                     },
-                tint = accentColor
+                tint = blackColor
             )
         }
     }

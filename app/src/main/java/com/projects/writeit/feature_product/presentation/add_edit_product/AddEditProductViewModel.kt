@@ -38,6 +38,10 @@ class AddEditProductViewModel @Inject constructor(
                             quantity = product.quantity,
                             isHintVisible = false
                         )
+                        _productPrice.value = productPrice.value.copy(
+                            price = product.price,
+                            isHintVisible = false
+                        )
                     }
                 }
             }
@@ -56,6 +60,11 @@ class AddEditProductViewModel @Inject constructor(
     ))
     val productQuantity: State<ProductTextFieldState> = _productQuantity
 
+    private val _productPrice = mutableStateOf(ProductTextFieldState(
+        hint = "Combien ça coûte... ?"
+    ))
+    val productPrice: State<ProductTextFieldState> = _productPrice
+
     /** State for one event action */
     private val _eventFlow = MutableSharedFlow<UiEvent>()
             val eventFlow = _eventFlow.asSharedFlow()
@@ -73,19 +82,30 @@ class AddEditProductViewModel @Inject constructor(
             }
             is AddEditProductEvent.ChangeTitleFocus -> {
                 _productName.value = productName.value.copy(
-                    isHintVisible = !event.focusState.isFocused &&
-                            productName.value.text.isBlank()
+                    isHintVisible = !event.focusState.isFocused && productName.value.text.isBlank()
+
                 )
             }
             is AddEditProductEvent.EnteredQuantity -> {
                 _productQuantity.value = productQuantity.value.copy(
-                    text = event.value
+                    quantityText = event.value
                 )
             }
             is AddEditProductEvent.ChangeQuantityFocus -> {
                 _productQuantity.value = productQuantity.value.copy(
                     isHintVisible = !event.focusState.isFocused &&
-                            productQuantity.value.text.isBlank()
+                            productQuantity.value.quantityText.isBlank()
+                )
+            }
+            is AddEditProductEvent.EnteredPrice -> {
+                _productPrice.value = productPrice.value.copy(
+                    priceText = event.value
+                )
+            }
+            is AddEditProductEvent.ChangePriceFocus -> {
+                _productPrice.value = productPrice.value.copy(
+                    isHintVisible = !event.focusState.isFocused &&
+                            productPrice.value.priceText.isBlank()
                 )
             }
             is AddEditProductEvent.SaveProduct -> {
@@ -96,10 +116,19 @@ class AddEditProductViewModel @Inject constructor(
                                 id = currentProductId,
                                 name = productName.value.text,
                                 timestamp = System.currentTimeMillis(),
-                                quantity = productQuantity.value.quantity
-                                )
+                                quantity = productQuantity.value.quantityText.toInt(),
+                                price = productPrice.value.priceText.toDouble()
+                            )
                         )
-
+                        _productPrice.value = productPrice.value.copy(
+                            priceText = ""
+                        )
+                        _productQuantity.value = productQuantity.value.copy(
+                            quantityText = ""
+                        )
+                        _productName.value = productName.value.copy(
+                            text = ""
+                        )
                         _eventFlow.emit(UiEvent.SaveProduct)
 
                     } catch(e: InvalidProductException){
@@ -122,6 +151,4 @@ class AddEditProductViewModel @Inject constructor(
         data class ShowSnackBar(val message: String) : UiEvent()
         data object SaveProduct : UiEvent()
     }
-
-
 }

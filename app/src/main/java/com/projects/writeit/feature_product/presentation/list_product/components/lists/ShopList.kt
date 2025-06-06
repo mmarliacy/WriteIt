@@ -1,39 +1,32 @@
 package com.projects.writeit.feature_product.presentation.list_product.components.lists
 
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.projects.writeit.feature_product.presentation.list_product.ProductsViewModel
 import com.projects.writeit.feature_product.presentation.list_product.components.item.ProductItem
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
-import kotlinx.coroutines.launch
 
 @Composable
 fun ShopList(
-    viewModel: ProductsViewModel,
-    scaffoldState: ScaffoldState
+    viewModel: ProductsViewModel
 ) {
-
     val state = viewModel.state.value
-    val scope = rememberCoroutineScope()
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(top = 10.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        itemsIndexed(state.products) { _, product ->
+        itemsIndexed(state.activeProducts) { _, product ->
             AnimatedVisibility(
                 visible = state.isDeletedProductIsVisible,
                 enter = expandVertically(),
@@ -41,19 +34,9 @@ fun ShopList(
             ) {
                 ProductItem(
                     product = product,
-                    onDeleteClick = {
-                        viewModel.onEvent(ProductsEvent.DeleteProduct(product))
-                        scope.launch {
-                            val result = scaffoldState.snackbarHostState.showSnackbar(
-                                message = "Produit supprimé",
-                                actionLabel = "Annuler"
-                            )
-                            if (result == SnackbarResult.ActionPerformed) {
-                                viewModel.onEvent(ProductsEvent.RestoreProduct)
-                            }
-                        }
-
-                    }
+                    onClickItem = {
+                        viewModel.onEvent(ProductsEvent.ArchiveProduct(product = product))
+                    },
                 )
             }
         }

@@ -15,9 +15,12 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Restore
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
@@ -26,10 +29,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -37,28 +42,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.projects.writeit.feature_product.presentation.list_product.components.CustomHorizontalPager
+import com.projects.writeit.feature_product.presentation.add_edit_product.components.BottomAddEditDialog
 import com.projects.writeit.feature_product.presentation.list_product.components.lists.ShopList
+import com.projects.writeit.feature_product.presentation.list_product.components.tabs.CustomHorizontalPager
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.CustomTabRow
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.TabItem
-import com.projects.writeit.feature_product.presentation.util.Screen
+import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
 import com.projects.writeit.ui.theme.blackColor
+import com.projects.writeit.ui.theme.darkAccentColor
 import com.projects.writeit.ui.theme.latoFamily
 import com.projects.writeit.ui.theme.whiteColor
-import kotlinx.coroutines.launch
 
 @Composable
 fun ProductsScreen(
-    navController: NavController,
     viewModel: ProductsViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
 
-    val scaffoldState = rememberScaffoldState()
+   // val scaffoldState = rememberScaffoldState()
     val pagerState = rememberPagerState(pageCount = { TabItem.entries.size })
-
     val initialListState = rememberLazyListState()
     val expandedFab by remember { derivedStateOf { initialListState.firstVisibleItemIndex != 0 } }
+    val currentSum by viewModel.totalPriceSum.collectAsState()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     Surface(
         modifier
@@ -78,24 +84,52 @@ fun ProductsScreen(
                             fontSize = 16.sp
                         )
                     },
-                    backgroundColor = blackColor
+                    backgroundColor = blackColor,
+                    actions = {
+                        Text(
+                            text = "$currentSum €",
+                            modifier = Modifier.padding(end = 16.dp),
+                            color = Color.White
+                        )
+                    }
                 )
             },
             //floatingActionButton
             floatingActionButton = {
-                ExtendedFloatingActionButton(containerColor = Color.Black,
-                    contentColor = Color.White,
-                    expanded = expandedFab,
-                    icon = { Icon(Icons.Filled.Add, "Open Add dialog") },
-                    text = { Text(text = "Ajouter") },
-                    modifier = Modifier.padding(20.dp),
-                    onClick = {
-                        navController.navigate(Screen.AddEditProductScreen)
-                    })
+                when(pagerState.currentPage){
+                     0 -> {
+                         ExtendedFloatingActionButton(containerColor = Color.Black,
+                             contentColor = Color.White,
+                             expanded = expandedFab,
+                             icon = { Icon(Icons.Filled.Add, "Open Add dialog") },
+                             text = { Text(text = "Ajouter") },
+                             modifier = Modifier.padding(20.dp),
+                             onClick = {
+                                 showBottomSheet = true
+                             })
+                    }
+                    1 -> {
+                        ExtendedFloatingActionButton(containerColor = darkAccentColor,
+                            contentColor = Color.White,
+                            expanded = expandedFab,
+                            icon = { Icon(Icons.Filled.Restore, "Restore All") },
+                            text = { Text(text = "Tout reprendre") },
+                            modifier = Modifier.padding(20.dp),
+                            onClick = {
+                                    viewModel.onEvent(ProductsEvent.RestoreAllProducts)
+                            })
+                    }
+                }
             }, floatingActionButtonPosition = FabPosition.End, modifier = modifier.fillMaxSize()
+
             //ModalBottomSheet
         ) {
-
+            if(showBottomSheet){
+                BottomAddEditDialog(
+                    onDismiss = { showBottomSheet = false },
+                    modifier = Modifier
+                )
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -106,13 +140,11 @@ fun ProductsScreen(
 
                 CustomHorizontalPager(
                     viewModel,
-                    scaffoldState,
                     pagerState
                 )
 
                 ShopList(
-                    viewModel = viewModel,
-                    scaffoldState = scaffoldState
+                    viewModel = viewModel
                 )
             }
         }

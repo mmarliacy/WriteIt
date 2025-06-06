@@ -4,7 +4,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProductRepository {
 
-    fun getProducts() : Flow<List<Product>>
+    fun getActiveProducts() : Flow<List<Product>>
+
+    fun getArchivedProducts() : Flow<List<Product>>
 
     suspend fun getProductById(id : Int): Product?
 

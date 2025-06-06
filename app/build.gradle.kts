@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.multidex)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.material)
 
     //--> Compose BOM with a version definition - Nomenclature
     val composeBom = platform(libs.androidx.compose.bom)

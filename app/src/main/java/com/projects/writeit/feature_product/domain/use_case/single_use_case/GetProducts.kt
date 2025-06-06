@@ -13,7 +13,7 @@ class GetProducts(
     operator fun invoke(
         productOrder: ProductOrder = ProductOrder.Date(OrderType.AscendingOrder)
     ): Flow<List<Product>>{
-            return repository.getProducts().map { products ->
+            return repository.getActiveProducts().map { products ->
                 when(productOrder.orderType){
                     is OrderType.AscendingOrder -> {
                         when(productOrder){

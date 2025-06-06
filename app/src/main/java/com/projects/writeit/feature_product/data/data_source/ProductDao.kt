@@ -11,8 +11,11 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ProductDao {
 
-    @Query("SELECT * FROM product_table")
-    fun getProducts() : Flow<List<Product>>
+    @Query("SELECT * FROM product_table WHERE isArchived = 0")
+    fun getActiveProducts() : Flow<List<Product>>
+
+    @Query("SELECT * FROM product_table WHERE isArchived = 1")
+    fun getArchivedProducts() : Flow<List<Product>>
 
     @Query("SELECT * FROM product_table WHERE id = :id")
     suspend fun getProductById(id : Int): Product?

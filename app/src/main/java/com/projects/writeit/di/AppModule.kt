@@ -9,6 +9,7 @@ import com.projects.writeit.feature_product.domain.use_case.single_use_case.AddP
 import com.projects.writeit.feature_product.domain.use_case.single_use_case.DeleteProduct
 import com.projects.writeit.feature_product.domain.use_case.single_use_case.GetProducts
 import com.projects.writeit.feature_product.domain.use_case.ProductUseCases
+import com.projects.writeit.feature_product.domain.use_case.single_use_case.GetArchivedProducts
 import com.projects.writeit.feature_product.domain.use_case.single_use_case.GetProduct
 import dagger.Module
 import dagger.Provides
@@ -27,7 +28,8 @@ object AppModule {
             app,
             ProductDatabase::class.java,
             ProductDatabase.DATABASE_NAME
-        ).build()
+        ).
+        fallbackToDestructiveMigration(false).build()
     }
 
     @Provides
@@ -41,6 +43,7 @@ object AppModule {
     fun providesProductUseCases(repository: ProductRepository): ProductUseCases {
         return ProductUseCases(
             getProducts = GetProducts(repository),
+            getArchivedProducts = GetArchivedProducts(repository),
             deleteProduct = DeleteProduct(repository),
             addProduct = AddProduct(repository),
             getProduct = GetProduct(repository)

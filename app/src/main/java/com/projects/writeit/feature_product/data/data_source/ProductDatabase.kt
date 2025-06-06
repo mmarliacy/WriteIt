@@ -6,7 +6,7 @@ import com.projects.writeit.feature_product.domain.model.Product
 
 @Database (
     entities = [Product::class],
-    version = 1
+    version = 3
 )
 abstract class ProductDatabase : RoomDatabase() {
     abstract val productDao: ProductDao
