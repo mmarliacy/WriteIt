@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Restore
 //noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
@@ -41,7 +40,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.projects.writeit.feature_product.presentation.add_edit_product.components.BottomAddEditDialog
 import com.projects.writeit.feature_product.presentation.list_product.components.lists.ShopList
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.CustomHorizontalPager

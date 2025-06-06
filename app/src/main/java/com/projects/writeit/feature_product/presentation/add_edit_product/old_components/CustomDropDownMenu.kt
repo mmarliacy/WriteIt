@@ -1,7 +1,6 @@
 package com.projects.writeit.feature_product.presentation.add_edit_product.old_components
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 
 @Composable
 fun CustomDropdownMenu() {
