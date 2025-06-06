@@ -5,12 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditScreen
 import com.projects.writeit.feature_product.presentation.list_product.ProductsScreen
 import com.projects.writeit.feature_product.presentation.util.Screen
 import com.projects.writeit.ui.theme.WriteItTheme
@@ -32,12 +29,7 @@ class MainActivity : ComponentActivity() {
                         startDestination = Screen.ProductsScreen
                     ) {
                         composable<Screen.ProductsScreen> {
-                            ProductsScreen(navController = navController)
-                        }
-                        composable<Screen.AddEditProductScreen> {
-                            AddEditScreen(
-                                navController = navController
-                            )
+                            ProductsScreen()
                         }
                     }
 
