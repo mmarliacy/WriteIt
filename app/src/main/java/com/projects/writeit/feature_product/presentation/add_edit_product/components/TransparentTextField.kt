@@ -26,7 +26,7 @@ fun TransparentTextField(
     textStyle: TextStyle = TextStyle(
         fontFamily = latoFamily,
         fontWeight = FontWeight.Light,
-        fontSize = 25.sp,
+        fontSize = 18.sp,
         fontStyle = FontStyle.Normal
     ),
     keyboardOptions: (KeyboardOptions),

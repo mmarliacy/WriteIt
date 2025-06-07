@@ -18,7 +18,9 @@ import com.projects.writeit.feature_product.presentation.list_product.util.Produ
 
 @Composable
 fun ShopList(
-    viewModel: ProductsViewModel
+    viewModel: ProductsViewModel,
+    isChecked: Boolean,
+    isDeletionModeActive: Boolean,
 ) {
     val state = viewModel.state.value
 
@@ -34,6 +36,8 @@ fun ShopList(
             ) {
                 ProductItem(
                     product = product,
+                    isChecked = isChecked,
+                    isDeletionModeActive = isDeletionModeActive,
                     onClickItem = {
                         viewModel.onEvent(ProductsEvent.ArchiveProduct(product = product))
                     },
