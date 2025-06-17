@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxColors
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,20 +24,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.projects.writeit.feature_product.domain.model.Product
+import com.projects.writeit.ui.theme.accentColor
 import com.projects.writeit.ui.theme.darkAccentColor
 import com.projects.writeit.ui.theme.latoFamily
+import com.projects.writeit.ui.theme.lightAccentColor
 import com.projects.writeit.ui.theme.surfaceLight
+import com.projects.writeit.ui.theme.whiteColor
 
 @Composable
 fun ProductItem(
     product: Product,
-    isChecked: Boolean,
     isDeletionModeActive: Boolean,
     onClickItem: () -> Unit,
+    onCheckedChange: () -> Unit
 ) {
 
-    val checkEnabled : Boolean by remember {
-        mutableStateOf(true)
+    var checked by remember {
+        mutableStateOf(false)
     }
     Surface(
         color = surfaceLight,
@@ -53,12 +59,16 @@ fun ProductItem(
         ) {
             if (isDeletionModeActive) {
                 Checkbox(
-                    checked = isChecked,
+                    checked = checked,
                     onCheckedChange = {
-                        it == true
+                        checked = it
+                        onCheckedChange()
                     },
-                    enabled = checkEnabled
-                )
+                    colors = CheckboxDefaults.colors(
+                        checkmarkColor = whiteColor,
+                        checkedColor = darkAccentColor
+                    )
+                    )
             }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(15.dp),

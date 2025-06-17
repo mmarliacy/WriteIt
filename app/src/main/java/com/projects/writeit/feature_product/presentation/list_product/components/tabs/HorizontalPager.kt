@@ -21,7 +21,7 @@ fun CustomHorizontalPager(viewModel: ProductsViewModel,
         modifier = Modifier.fillMaxWidth()
     ) {
         when(pagerState.currentPage){
-            0 -> ShopList(viewModel,isChecked, isDeletionModeActive)
+            0 -> ShopList(viewModel,isDeletionModeActive)
             1 -> ArchivedList(viewModel)
         }
     }

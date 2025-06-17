@@ -19,7 +19,6 @@ import com.projects.writeit.feature_product.presentation.list_product.util.Produ
 @Composable
 fun ShopList(
     viewModel: ProductsViewModel,
-    isChecked: Boolean,
     isDeletionModeActive: Boolean,
 ) {
     val state = viewModel.state.value
@@ -28,19 +27,21 @@ fun ShopList(
         modifier = Modifier.fillMaxSize().padding(top = 10.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        itemsIndexed(state.activeProducts) { _, product ->
+        itemsIndexed(state.selectableActiveProducts) { _, selectableProduct ->
             AnimatedVisibility(
                 visible = state.isDeletedProductIsVisible,
                 enter = expandVertically(),
                 exit = shrinkVertically(animationSpec = tween(durationMillis = 1000))
             ) {
                 ProductItem(
-                    product = product,
-                    isChecked = isChecked,
+                    product = selectableProduct.product,
                     isDeletionModeActive = isDeletionModeActive,
                     onClickItem = {
-                        viewModel.onEvent(ProductsEvent.ArchiveProduct(product = product))
+                        viewModel.onEvent(ProductsEvent.ArchiveProduct(product = selectableProduct.product))
                     },
+                    onCheckedChange = {
+                            viewModel.onEvent(ProductsEvent.ToggleProductSelection(productId = selectableProduct.product.id!!))
+                    }
                 )
             }
         }

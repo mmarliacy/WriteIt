@@ -12,6 +12,7 @@ import com.projects.writeit.feature_product.domain.util.OrderType
 import com.projects.writeit.feature_product.domain.util.ProductOrder
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsState
+import com.projects.writeit.feature_product.presentation.list_product.util.SelectableProduct
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
@@ -44,10 +45,13 @@ class ProductsViewModel @Inject constructor(
         getArchivedProducts(productOrder = ProductOrder.Date(OrderType.AscendingOrder))
     }
 
-    val totalPriceSum: StateFlow<Double> = snapshotFlow {state.value.activeProducts}
+    val totalPriceSum: StateFlow<Double> = snapshotFlow { state.value.selectableActiveProducts }
         .map { liste ->
-            Log.i("SUM", "Calcul de somme: ${liste.sumOf { it.price * it.quantity }}")
-            val total = liste.sumOf { it.price * it.quantity }
+            Log.i(
+                "SUM",
+                "Calcul de somme: ${liste.sumOf { it.product.price * it.product.quantity }}"
+            )
+            val total = liste.sumOf { it.product.price * it.product.quantity }
             val arrondi = BigDecimal(total).setScale(2, RoundingMode.HALF_UP).toDouble()
             Log.i("SUM", "Calcul de somme: $arrondi")
             arrondi
@@ -76,9 +80,10 @@ class ProductsViewModel @Inject constructor(
                 viewModelScope.launch {
                     val archivedProduct = event.product.copy(isArchived = true)
                     productUseCases.addProduct(archivedProduct)
-                   // _eventFlow.emit(UiEvent.ShowSnackbar("Produit archivé"))
+                    // _eventFlow.emit(UiEvent.ShowSnackbar("Produit archivé"))
                 }
             }
+
             is ProductsEvent.DisArchiveProduct -> {
                 viewModelScope.launch {
                     val disArchiveProduct = event.product.copy(isArchived = false)
@@ -93,32 +98,79 @@ class ProductsViewModel @Inject constructor(
                     recentlyDeletedProduct = null
                 }
             }
+
             is ProductsEvent.RestoreAllProducts -> {
                 viewModelScope.launch {
                     productUseCases.getArchivedProducts()
                         .first()
-                        .onEach {
-                         oldProduct ->
+                        .onEach { oldProduct ->
                             val productToRestore = oldProduct.copy(
                                 isArchived = false
                             )
                             productUseCases.addProduct(productToRestore)
                         }
-                    }
-               // _eventFlow.emit(UiEvent.ShowSnackbar("Tous les produits ont été restaurés"))
                 }
+                // _eventFlow.emit(UiEvent.ShowSnackbar("Tous les produits ont été restaurés"))
+            }
+
+            is ProductsEvent.ToggleProductSelectionMode -> {
+                _state.value = state.value.copy(
+                    isSelectionMode = !state.value.isSelectionMode
+                )
+            }
+
+            is ProductsEvent.ToggleProductSelection -> {
+                viewModelScope.launch {
+                    val updatedList =
+                        state.value.selectableActiveProducts.map { selectableProduct ->
+                            if (selectableProduct.product.id == event.productId) {
+                                selectableProduct.copy(isChecked = !selectableProduct.isChecked)
+                            } else selectableProduct
+                        }
+                    _state.value = state.value.copy(selectableActiveProducts = updatedList)
+
+                    if (state.value.selectableActiveProducts.any { it.isChecked }){
+                        _state.value = state.value.copy(buttonDeleteIsVisible = true)
+                    } else {
+                        _state.value = state.value.copy(buttonDeleteIsVisible = false)
+                    }
+                }
+            }
+
+            is ProductsEvent.DeleteSelectedProducts -> {
+                val selectedItemsList = state.value.selectableActiveProducts
+                    .filter { it.isChecked }.map {
+                        it.product
+                    }
+
+                selectedItemsList.forEach {
+                    viewModelScope.launch {
+                        productUseCases.deleteProduct(it)
+                    }
+                }
+                val updatedList = state.value.selectableActiveProducts
+                    .filter { !it.isChecked }
+                _state.value = state.value.copy(
+                    selectableActiveProducts = updatedList,
+                    isSelectionMode = false,
+                    buttonDeleteIsVisible = false
+                )
+            }
         }
     }
 
     private fun getActiveProducts(productOrder: ProductOrder) {
         getActiveProductsJob?.cancel()
         getActiveProductsJob = productUseCases.getProducts(productOrder).onEach {
+            val selectableList = it.map { product ->
+                SelectableProduct(product = product)
+            }
             _state.value = state.value.copy(
-                activeProducts = it,
+                selectableActiveProducts = selectableList,
                 productsOrder = productOrder
             )
         }.launchIn(viewModelScope)
-        Log.i("DEBUG", "Produits: ${state.value.activeProducts.map { it.name }}")
+        Log.i("DEBUG", "Produits: ${state.value.selectableActiveProducts.map { it.product.name }}")
     }
 
     private fun getArchivedProducts(productOrder: ProductOrder) {
@@ -129,6 +181,9 @@ class ProductsViewModel @Inject constructor(
                 productsOrder = productOrder
             )
         }.launchIn(viewModelScope)
-        Log.i("ARCHIVE DEBUG", "Produits archivés : ${state.value.activeProducts.map { it.name }}")
+        Log.i(
+            "ARCHIVE DEBUG",
+            "Produits archivés : ${state.value.selectableActiveProducts.map { it.product.name }}"
+        )
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.EuroSymbol
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -24,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
@@ -64,9 +66,7 @@ fun ProductsScreen(
     var dropDownExpanded by remember {
         mutableStateOf(false)
     }
-    var isDeletionModeActive by remember {
-        mutableStateOf(false)
-    }
+    val state = viewModel.state.value
     var isChecked by remember {
         mutableStateOf(false)
     }
@@ -97,21 +97,34 @@ fun ProductsScreen(
                         actionIconContentColor = whiteColor
 
                     ),
-                        actions = {
-                            Text(
-                                text = "$currentSum €",
-                                modifier = Modifier.padding(end = 20.dp),
-                                color = Color.White
-                            )
+                    actions = {
+                        if (state.buttonDeleteIsVisible){
+                            TextButton(
+                                onClick = {
+                                    viewModel.onEvent(ProductsEvent.DeleteSelectedProducts(state.selectableActiveProducts))
+                                }
+                            ) {
+                                Text(
+                                    text = "Supprimer",
+                                    modifier = Modifier.padding(end = 20.dp),
+                                    color = Color.White
+                                )
+                            }
                         }
+                        Text(
+                            text = "$currentSum €",
+                            modifier = Modifier.padding(end = 20.dp),
+                            color = Color.White
                         )
-                    },
+                    }
+                )
+            },
             bottomBar = {
-                BottomAppBar (
+                BottomAppBar(
                     actions = {
                         IconButton(onClick = {
                             dropDownExpanded = true
-                        }){
+                        }) {
                             Icon(
                                 imageVector = Icons.Filled.FilterList,
                                 contentDescription = "SortButton"
@@ -123,15 +136,15 @@ fun ProductsScreen(
                                 }
                             )
                         }
-                        IconButton(onClick = {}){
+                        IconButton(onClick = {}) {
                             Icon(
                                 imageVector = Icons.Filled.EuroSymbol,
                                 contentDescription = "BudgetButton"
                             )
                         }
                         IconButton(onClick = {
-                        isDeletionModeActive = !isDeletionModeActive
-                        }){
+                            viewModel.onEvent(ProductsEvent.ToggleProductSelectionMode)
+                        }) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
                                 contentDescription = "DeleteButton"
@@ -156,7 +169,7 @@ fun ProductsScreen(
                                     contentColor = Color.White,
                                     onClick = {
                                         viewModel.onEvent(ProductsEvent.RestoreAllProducts)
-                                    }){
+                                    }) {
                                     Icon(Icons.Filled.Restore, "Restore All")
                                 }
                             }
@@ -165,42 +178,42 @@ fun ProductsScreen(
                 )
             },
 
-                    floatingActionButtonPosition = FabPosition.End,
-                    modifier = modifier.fillMaxSize()
+            floatingActionButtonPosition = FabPosition.End,
+            modifier = modifier.fillMaxSize()
 
-                    //ModalBottomSheet
-                ) {
-                    if (showBottomSheet) {
-                        BottomAddEditDialog(
-                            onDismiss = { showBottomSheet = false },
-                            modifier = Modifier
-                        )
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = it.calculateTopPadding())
-                            .background(whiteColor)
-                    ) {
-                        CustomTabRow(pagerState = pagerState)
-
-                        CustomHorizontalPager(
-                            viewModel,
-                            pagerState,
-                                    isChecked = isChecked,
-                            isDeletionModeActive = isDeletionModeActive
-                        )
-
-                        ShopList(
-                            viewModel = viewModel,
-                            isChecked = isChecked,
-                            isDeletionModeActive = isDeletionModeActive
-                        )
-                    }
-                }
+            //ModalBottomSheet
+        ) {
+            if (showBottomSheet) {
+                BottomAddEditDialog(
+                    onDismiss = { showBottomSheet = false },
+                    modifier = Modifier
+                )
             }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = it.calculateTopPadding())
+                    .background(whiteColor)
+            ) {
+                CustomTabRow(pagerState = pagerState)
+
+                CustomHorizontalPager(
+                    viewModel,
+                    pagerState,
+                    isChecked = isChecked,
+                    isDeletionModeActive = state.isSelectionMode
+
+                )
+
+                ShopList(
+                    viewModel = viewModel,
+                    isDeletionModeActive = state.isSelectionMode
+                )
+            }
+        }
     }
+}
 
 
 
