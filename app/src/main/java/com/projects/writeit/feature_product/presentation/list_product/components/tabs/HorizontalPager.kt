@@ -11,9 +11,7 @@ import com.projects.writeit.feature_product.presentation.list_product.components
 
 @Composable
 fun CustomHorizontalPager(viewModel: ProductsViewModel,
-                          pagerState: PagerState,
-                          isChecked: Boolean,
-                          isDeletionModeActive: Boolean,
+                          pagerState: PagerState
 ){
 
     HorizontalPager(
@@ -21,7 +19,7 @@ fun CustomHorizontalPager(viewModel: ProductsViewModel,
         modifier = Modifier.fillMaxWidth()
     ) {
         when(pagerState.currentPage){
-            0 -> ShopList(viewModel,isDeletionModeActive)
+            0 -> ShopList(viewModel)
             1 -> ArchivedList(viewModel)
         }
     }

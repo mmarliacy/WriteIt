@@ -150,6 +150,7 @@ class ProductsViewModel @Inject constructor(
                 }
                 val updatedList = state.value.selectableActiveProducts
                     .filter { !it.isChecked }
+                    .map { it.copy(isChecked = false) }
                 _state.value = state.value.copy(
                     selectableActiveProducts = updatedList,
                     isSelectionMode = false,

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,24 +23,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.projects.writeit.feature_product.domain.model.Product
-import com.projects.writeit.ui.theme.accentColor
 import com.projects.writeit.ui.theme.darkAccentColor
 import com.projects.writeit.ui.theme.latoFamily
-import com.projects.writeit.ui.theme.lightAccentColor
 import com.projects.writeit.ui.theme.surfaceLight
 import com.projects.writeit.ui.theme.whiteColor
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @Composable
 fun ProductItem(
     product: Product,
     isDeletionModeActive: Boolean,
+    checked : Boolean,
     onClickItem: () -> Unit,
-    onCheckedChange: () -> Unit
+    onCheckedChange: (Boolean) -> Unit
 ) {
 
-    var checked by remember {
-        mutableStateOf(false)
-    }
+    val prixTotal = BigDecimal(product.price * product.quantity)
+        .setScale(2, RoundingMode.HALF_UP)
+        .toString()
+
     Surface(
         color = surfaceLight,
         modifier = Modifier
@@ -61,8 +62,7 @@ fun ProductItem(
                 Checkbox(
                     checked = checked,
                     onCheckedChange = {
-                        checked = it
-                        onCheckedChange()
+                        onCheckedChange(it)
                     },
                     colors = CheckboxDefaults.colors(
                         checkmarkColor = whiteColor,
@@ -104,7 +104,7 @@ fun ProductItem(
                     color = darkAccentColor
                 ) {
                     Text(
-                        text = "${product.price*product.quantity} €",
+                        text = "$prixTotal €",
                         color = Color.White,
                         modifier = Modifier.padding(start = 5.dp, end = 5.dp)
                     )

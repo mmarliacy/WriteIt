@@ -16,7 +16,6 @@ import androidx.compose.material.icons.filled.EuroSymbol
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -67,9 +66,6 @@ fun ProductsScreen(
         mutableStateOf(false)
     }
     val state = viewModel.state.value
-    var isChecked by remember {
-        mutableStateOf(false)
-    }
 
     Surface(
         modifier
@@ -193,22 +189,18 @@ fun ProductsScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = it.calculateTopPadding())
+                    .padding(top = it.calculateTopPadding(), bottom = it.calculateBottomPadding())
                     .background(whiteColor)
             ) {
                 CustomTabRow(pagerState = pagerState)
 
                 CustomHorizontalPager(
                     viewModel,
-                    pagerState,
-                    isChecked = isChecked,
-                    isDeletionModeActive = state.isSelectionMode
-
+                    pagerState
                 )
 
                 ShopList(
-                    viewModel = viewModel,
-                    isDeletionModeActive = state.isSelectionMode
+                    viewModel = viewModel
                 )
             }
         }
