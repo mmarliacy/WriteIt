@@ -120,6 +120,11 @@ class AddEditProductViewModel @Inject constructor(
                                 price = productPrice.value.priceText.toDouble()
                             )
                         )
+                        _eventFlow.emit(UiEvent.SaveProduct)
+                        _eventFlow.emit(UiEvent.ShowSnackBar("${productName.value.text} a été ajouté à la liste"))
+
+                        // All texts fields reset
+
                         _productPrice.value = productPrice.value.copy(
                             priceText = ""
                         )
@@ -129,7 +134,6 @@ class AddEditProductViewModel @Inject constructor(
                         _productName.value = productName.value.copy(
                             text = ""
                         )
-                        _eventFlow.emit(UiEvent.SaveProduct)
 
                     } catch(e: InvalidProductException){
                       _eventFlow.emit(
@@ -138,7 +142,9 @@ class AddEditProductViewModel @Inject constructor(
                           )
                       )
                     }
+
                 }
+
             }
         }
 

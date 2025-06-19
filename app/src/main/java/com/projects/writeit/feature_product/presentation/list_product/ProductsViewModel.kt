@@ -88,7 +88,7 @@ class ProductsViewModel @Inject constructor(
                 viewModelScope.launch {
                     val disArchiveProduct = event.product.copy(isArchived = false)
                     productUseCases.addProduct(disArchiveProduct)
-                    // _eventFlow.emit(UiEvent.ShowSnackbar("Produit archivé"))
+                   //_eventFlow.emit(UiEvent.ShowSnackbar("Produit archivé"))
                 }
             }
 
@@ -110,7 +110,7 @@ class ProductsViewModel @Inject constructor(
                             productUseCases.addProduct(productToRestore)
                         }
                 }
-                // _eventFlow.emit(UiEvent.ShowSnackbar("Tous les produits ont été restaurés"))
+                //_eventFlow.emit(UiEvent.ShowSnackbar("Tous les produits ont été restaurés"))
             }
 
             is ProductsEvent.ToggleProductSelectionMode -> {

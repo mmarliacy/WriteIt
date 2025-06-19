@@ -1,4 +1,4 @@
-package com.projects.writeit.feature_product.presentation.add_edit_product.components
+package com.projects.writeit.feature_product.presentation.add_edit_product
 
 
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +26,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditProductViewModel
+import com.projects.writeit.feature_product.presentation.add_edit_product.components.CustomButton
+import com.projects.writeit.feature_product.presentation.add_edit_product.components.CustomTitle
+import com.projects.writeit.feature_product.presentation.add_edit_product.components.TransparentTextField
 import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditProductEvent
 import com.projects.writeit.ui.theme.darkAccentColor
 import com.projects.writeit.ui.theme.latoFamily
@@ -54,15 +56,11 @@ fun BottomAddEditDialog(
     ) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                is AddEditProductViewModel.UiEvent.ShowSnackBar -> {
-                    scaffoldState.snackbarHostState.showSnackbar(
-                        message = event.message
-                    )
-                }
-
                 is AddEditProductViewModel.UiEvent.SaveProduct -> {
                     onDismiss()
                 }
+
+                else -> Unit
             }
         }
     }

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -28,6 +30,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.projects.writeit.feature_product.presentation.add_edit_product.components.BottomAddEditDialog
+import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditProductViewModel
+import com.projects.writeit.feature_product.presentation.add_edit_product.BottomAddEditDialog
 import com.projects.writeit.feature_product.presentation.list_product.components.lists.ShopList
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.CustomHorizontalPager
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.CustomTabRow
@@ -50,11 +54,13 @@ import com.projects.writeit.ui.theme.blackColor
 import com.projects.writeit.ui.theme.darkAccentColor
 import com.projects.writeit.ui.theme.latoFamily
 import com.projects.writeit.ui.theme.whiteColor
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductsScreen(
     viewModel: ProductsViewModel = hiltViewModel(),
+    editViewModel: AddEditProductViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
 
@@ -66,6 +72,18 @@ fun ProductsScreen(
         mutableStateOf(false)
     }
     val state = viewModel.state.value
+    val snackBarHostState = remember { SnackbarHostState() }
+
+
+    LaunchedEffect(
+        true
+    ) {
+        editViewModel.eventFlow.collectLatest { event ->
+            if (event is AddEditProductViewModel.UiEvent.ShowSnackBar) {
+                snackBarHostState.showSnackbar(event.message)
+            }
+        }
+    }
 
     Surface(
         modifier
@@ -74,7 +92,8 @@ fun ProductsScreen(
             .fillMaxSize()
     ) {
         Scaffold(
-            topBar = {
+            snackbarHost = {SnackbarHost(hostState = snackBarHostState)},
+                    topBar = {
                 TopAppBar(
                     title = {
                         Text(
@@ -94,7 +113,7 @@ fun ProductsScreen(
 
                     ),
                     actions = {
-                        if (state.buttonDeleteIsVisible){
+                        if (state.buttonDeleteIsVisible) {
                             TextButton(
                                 onClick = {
                                     viewModel.onEvent(ProductsEvent.DeleteSelectedProducts(state.selectableActiveProducts))
@@ -175,7 +194,8 @@ fun ProductsScreen(
             },
 
             floatingActionButtonPosition = FabPosition.End,
-            modifier = modifier.fillMaxSize()
+            modifier = modifier.fillMaxSize(),
+
 
             //ModalBottomSheet
         ) {
