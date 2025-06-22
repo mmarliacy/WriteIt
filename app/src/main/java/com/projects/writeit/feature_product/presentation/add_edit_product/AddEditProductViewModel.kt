@@ -108,6 +108,24 @@ class AddEditProductViewModel @Inject constructor(
                             productPrice.value.priceText.isBlank()
                 )
             }
+
+            is AddEditProductEvent.InitProduct -> {
+                currentProductId = event.product.id
+                _productName.value = productName.value.copy(
+                    text = event.product.name,
+                    isHintVisible = false
+                )
+                _productQuantity.value = productQuantity.value.copy(
+                    quantityText = event.product.quantity.toString(),
+                    isHintVisible = false
+                )
+                _productPrice.value = productPrice.value.copy(
+                    priceText = event.product.price.toString(),
+                    isHintVisible = false
+                )
+            }
+
+
             is AddEditProductEvent.SaveProduct -> {
                 viewModelScope.launch {
                     try {
@@ -121,7 +139,12 @@ class AddEditProductViewModel @Inject constructor(
                             )
                         )
                         _eventFlow.emit(UiEvent.SaveProduct)
-                        _eventFlow.emit(UiEvent.ShowSnackBar("${productName.value.text} a été ajouté à la liste"))
+                        if (currentProductId == null){
+                            _eventFlow.emit(UiEvent.ShowSnackBar("${productName.value.text} a été ajouté à la liste"))
+                        } else {
+                            _eventFlow.emit(UiEvent.ShowSnackBar("${productName.value.text} a été mis à jour"))
+                        }
+
 
                         // All texts fields reset
 

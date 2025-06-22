@@ -13,5 +13,6 @@ sealed class ProductsEvent {
     data object ToggleProductSelectionMode : ProductsEvent()
     data object RestoreProduct : ProductsEvent()
     data object RestoreAllProducts : ProductsEvent()
+    data object ToggleBottomDialog : ProductsEvent()
 
 }

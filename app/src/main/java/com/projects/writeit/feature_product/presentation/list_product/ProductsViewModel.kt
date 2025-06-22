@@ -15,8 +15,10 @@ import com.projects.writeit.feature_product.presentation.list_product.util.Produ
 import com.projects.writeit.feature_product.presentation.list_product.util.SelectableProduct
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -39,6 +41,16 @@ class ProductsViewModel @Inject constructor(
 
     private var getActiveProductsJob: Job? = null
     private var getArchivedProductsJob: Job? = null
+
+    val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
+    private val _productToEdit = mutableStateOf<Product?>(null)
+    val productToEdit: State<Product?> = _productToEdit
+
+    fun productToEdit(product: Product){
+        _productToEdit.value = product
+    }
 
     init {
         getActiveProducts(productOrder = ProductOrder.Date(OrderType.AscendingOrder))
@@ -69,18 +81,30 @@ class ProductsViewModel @Inject constructor(
                 getActiveProducts(event.productOrder)
             }
 
+
+
             is ProductsEvent.DeleteProduct -> {
                 viewModelScope.launch {
                     productUseCases.deleteProduct(event.product)
                     recentlyDeletedProduct = event.product
+                    _eventFlow.emit(UiEvent.ShowSnackBar("Produit supprimé"))
                 }
             }
 
+            is ProductsEvent.ToggleBottomDialog -> {
+                _state.value = state.value.copy(
+                    showBottomSheet = !state.value.showBottomSheet
+                )
+            }
+
+            //-------------------------------------------------------
+            //----> RESTORE ONE OR MANY PRODUCTS  -------------->>>>>
+            //-------------------------------------------------------
             is ProductsEvent.ArchiveProduct -> {
                 viewModelScope.launch {
                     val archivedProduct = event.product.copy(isArchived = true)
                     productUseCases.addProduct(archivedProduct)
-                    // _eventFlow.emit(UiEvent.ShowSnackbar("Produit archivé"))
+                    _eventFlow.emit(UiEvent.ShowSnackBar("${archivedProduct.name} a été archivé"))
                 }
             }
 
@@ -88,14 +112,18 @@ class ProductsViewModel @Inject constructor(
                 viewModelScope.launch {
                     val disArchiveProduct = event.product.copy(isArchived = false)
                     productUseCases.addProduct(disArchiveProduct)
-                   //_eventFlow.emit(UiEvent.ShowSnackbar("Produit archivé"))
+                    _eventFlow.emit(UiEvent.ShowSnackBar("${disArchiveProduct.name} est de nouveau dans ta liste"))
                 }
             }
 
+            //-------------------------------------------------------
+            //----> RESTORE ONE OR MANY PRODUCTS  -------------->>>>>
+            //-------------------------------------------------------
             is ProductsEvent.RestoreProduct -> {
                 viewModelScope.launch {
                     productUseCases.addProduct(recentlyDeletedProduct ?: return@launch)
                     recentlyDeletedProduct = null
+                    _eventFlow.emit(UiEvent.ShowSnackBar("Produit remis dans la liste"))
                 }
             }
 
@@ -109,15 +137,21 @@ class ProductsViewModel @Inject constructor(
                             )
                             productUseCases.addProduct(productToRestore)
                         }
+                    _eventFlow.emit(UiEvent.ShowSnackBar("Tous les produits ont été restaurés"))
                 }
-                //_eventFlow.emit(UiEvent.ShowSnackbar("Tous les produits ont été restaurés"))
             }
+
+            //-------------------------------------------------------
+            //----> TOGGLE & HANDLE PRODUCTS TO DELETE --------->>>>>
+            //-------------------------------------------------------
 
             is ProductsEvent.ToggleProductSelectionMode -> {
                 _state.value = state.value.copy(
                     isSelectionMode = !state.value.isSelectionMode
                 )
             }
+
+
 
             is ProductsEvent.ToggleProductSelection -> {
                 viewModelScope.launch {
@@ -129,37 +163,45 @@ class ProductsViewModel @Inject constructor(
                         }
                     _state.value = state.value.copy(selectableActiveProducts = updatedList)
 
-                    if (state.value.selectableActiveProducts.any { it.isChecked }){
+                    if (state.value.selectableActiveProducts.any { it.isChecked }) {
                         _state.value = state.value.copy(buttonDeleteIsVisible = true)
                     } else {
                         _state.value = state.value.copy(buttonDeleteIsVisible = false)
                     }
                 }
             }
-
+            //--------------------------------------------
+            //----> DELETE SELECTED PRODUCT --------->>>>>
+            //--------------------------------------------
             is ProductsEvent.DeleteSelectedProducts -> {
-                val selectedItemsList = state.value.selectableActiveProducts
-                    .filter { it.isChecked }.map {
-                        it.product
-                    }
+                viewModelScope.launch {
+                    val selectedItemsList = state.value.selectableActiveProducts
+                        .filter { it.isChecked }.map {
+                            it.product
+                        }
 
-                selectedItemsList.forEach {
-                    viewModelScope.launch {
+                    selectedItemsList.forEach {
                         productUseCases.deleteProduct(it)
                     }
+                    Log.d("SNACKBAR", "Suppression détectée, affichage snackbar")
+                    _eventFlow.emit(UiEvent.ShowSnackBar("${selectedItemsList.size} produit(s) supprimé(s)"))
+                    val updatedList = state.value.selectableActiveProducts
+                        .filter { !it.isChecked }
+                        .map { it.copy(isChecked = false) }
+                    _state.value = state.value.copy(
+                        selectableActiveProducts = updatedList,
+                        isSelectionMode = false,
+                        buttonDeleteIsVisible = false
+                    )
+
                 }
-                val updatedList = state.value.selectableActiveProducts
-                    .filter { !it.isChecked }
-                    .map { it.copy(isChecked = false) }
-                _state.value = state.value.copy(
-                    selectableActiveProducts = updatedList,
-                    isSelectionMode = false,
-                    buttonDeleteIsVisible = false
-                )
             }
         }
     }
 
+    //--------------------------------------------
+    //----> GET INITIAL PRODUCTS ------------>>>>>
+    //--------------------------------------------
     private fun getActiveProducts(productOrder: ProductOrder) {
         getActiveProductsJob?.cancel()
         getActiveProductsJob = productUseCases.getProducts(productOrder).onEach {
@@ -174,6 +216,9 @@ class ProductsViewModel @Inject constructor(
         Log.i("DEBUG", "Produits: ${state.value.selectableActiveProducts.map { it.product.name }}")
     }
 
+    //---------------------------------------------
+    //----> GET ARCHIVED PRODUCTS ------------>>>>>
+    //---------------------------------------------
     private fun getArchivedProducts(productOrder: ProductOrder) {
         getArchivedProductsJob?.cancel()
         getArchivedProductsJob = productUseCases.getArchivedProducts(productOrder).onEach {
@@ -186,5 +231,12 @@ class ProductsViewModel @Inject constructor(
             "ARCHIVE DEBUG",
             "Produits archivés : ${state.value.selectableActiveProducts.map { it.product.name }}"
         )
+    }
+
+    //---------------------------------------------------------------------------------------
+    // -- ONE TIME UI EVENT -->
+    //------------------------------------
+    sealed class UiEvent {
+        data class ShowSnackBar(val message: String) : UiEvent()
     }
 }

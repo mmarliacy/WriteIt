@@ -8,9 +8,8 @@ data class ProductsState(
     val selectableActiveProducts: List<SelectableProduct> = emptyList(),
     val archivedProducts: List<Product> = emptyList(),
     val productsOrder: ProductOrder = ProductOrder.Date(OrderType.AscendingOrder),
-    val addButtonIsExpanded: Boolean = false,
     val isDeletedProductIsVisible: Boolean = true,
-    val addEditDialog: Boolean = false,
+    val showBottomSheet : Boolean = false,
     val isSelectionMode: Boolean = false,
     val buttonDeleteIsVisible: Boolean = false,
 )

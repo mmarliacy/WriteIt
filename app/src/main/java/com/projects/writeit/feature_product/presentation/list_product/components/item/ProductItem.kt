@@ -1,6 +1,8 @@
 package com.projects.writeit.feature_product.presentation.list_product.components.item
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,6 +39,7 @@ fun ProductItem(
     isDeletionModeActive: Boolean,
     checked : Boolean,
     onClickItem: () -> Unit,
+    onLongClickItem: () -> Unit,
     onCheckedChange: (Boolean) -> Unit
 ) {
 
@@ -45,11 +49,15 @@ fun ProductItem(
 
     Surface(
         color = surfaceLight,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.
+            fillMaxWidth()
             .padding(start = 10.dp, end = 10.dp)
             .clickable {
                 onClickItem()
+            }.pointerInput(Unit){
+                detectTapGestures {
+                    onLongClickItem()
+                }
             },
         shape = RoundedCornerShape(5.dp)
     ) {
