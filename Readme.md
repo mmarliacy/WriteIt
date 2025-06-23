@@ -3,14 +3,14 @@
 
 
 ### Summary
-   1. [General information](#general-information);
-   2. [Screenshots](#screenshots);
-   3. [Dependencies and technologies used](#technologies-used);
-   4. [Architecture](#Architecture)
-   5. [How to run / install](#how-to-run);
-   6. [Features developed](#features-developed);
-   7. [Project status / What's next ](#what-s-next).
-   8. [Android Studio Version](#android-studio-version).
+	1. [🧠 General Information](#general-information)
+	2. [📸 Screenshots](#screenshots)
+	3. [🧰 Technologies Used](#technologies-used)
+	4. [🧬 Architecture](#architecture)
+	5. [🛠️ How to Run](#how-to-run)
+	6. [✨ Features Developed](#features-developed)
+	7. [🚀 What's Next](#whats-next)
+	8. [💻 Android Studio Version](#android-studio-version)
 
 ***
 #### #🧠 General information
@@ -39,7 +39,7 @@ Additionally:
   * [Material 3](https://developer.android.com/develop/ui/compose/designsystems/material3?hl=fr): Version 1.3.2
 
 ***
-#### #🧱 Architecture
+#### #🧬 Architecture
 ***
 This project follows the MVVM (Model-View-ViewModel) architecture using:
 - State management with StateFlow and MutableSharedFlow
