@@ -3,23 +3,23 @@
 
 
 ### Summary
-1. [🧠 General Information](#general-information)
-2. [📸 Screenshots](#screenshots)
-3. [🧰 Technologies Used](#technologies-used)
-4. [🧬 Architecture](#architecture)
-5. [🛠️ How to Run](#how-to-run)
-6. [✨ Features Developed](#features-developed)
-7. [🚀 What's Next](#whats-next)
-8. [💻 Android Studio Version](#android-studio-version)
+1. [General Information](#general-information)
+2. [Screenshots](#screenshots)
+3. [Technologies Used](#technologies-used)
+4. [Architecture](#architecture)
+5. [How to Run](#how-to-run)
+6. [Features Developed](#features-developed)
+7. [What's Next](#whats-next)
+8. [Android Studio Version](#android-studio-version)
 
 ***
-#### 🧠 General information
+#### General information
 ***
 *WRITE IT is an app that frees your mind by helping you plan your shopping list. From the basics, I've created this app, cause because I'm the kind of person who… writing everything down to free my mind and don't forget anything.*
 
 
 ***
-#### 📸 Screenshots
+#### Screenshots
 ***
 * [Shopping list Preview](screenshots/shopping_list_preview.png) 
 * [Selection Mode for deletion](screenshots/delete_selection_mode.png)
@@ -28,7 +28,7 @@
 * [Filter to come](filter.png)
 
 ***
-#### 🧰 Technologies used
+#### Technologies used
 ***
 A number of dependencies and libraries were used for this project, among them:
   * [Coroutines](https://github.com/Kotlin/kotlinx.coroutines): Version 1.5.0 - 1.7.3
@@ -39,7 +39,7 @@ Additionally:
   * [Material 3](https://developer.android.com/develop/ui/compose/designsystems/material3?hl=fr): Version 1.3.2
 
 ***
-#### 🧬 Architecture
+#### Architecture
 ***
 This project follows the MVVM (Model-View-ViewModel) architecture using:
 - State management with StateFlow and MutableSharedFlow
@@ -48,7 +48,7 @@ This project follows the MVVM (Model-View-ViewModel) architecture using:
 - Hilt for dependency injection
 
 ***
-#### 🛠 How to run
+#### How to run
 ***
 1. Download the repository at the following URL: https://github.com/mmarliacy/WriteIt.
 2. Extract the "WriteIt-main" folder to your desired destination (e.g., Desktop)..
@@ -57,7 +57,7 @@ This project follows the MVVM (Model-View-ViewModel) architecture using:
 5. Android Studio, with the intervention of Gradle will synchronize the project, in case of outdated technologies or dependencies, update the project, clicking again on: **File -> Sync Project with Gradle Files**.
 
 ***
-#### ✨ Features developed
+#### Features developed
 ***
 
 * Easily plan and list the products you need before going shopping.
@@ -66,7 +66,7 @@ This project follows the MVVM (Model-View-ViewModel) architecture using:
 * Also you can archive a product (with its parameters - price, quantity...) if you don't need it at some point, but take it back to your list whenever you feel so.
 
 ***
-#### 🚀 What's next
+#### What's next
 ***
 
 * Add "category" variable in "Product" item to get a better products' apportionment  
@@ -77,6 +77,6 @@ This project follows the MVVM (Model-View-ViewModel) architecture using:
 
 
 ***
-#### 💻 Android Studio version
+#### Android Studio version
 ***
 > This project was made using Android Studio Ladybug | 2024.2.1 Patch 2. 
