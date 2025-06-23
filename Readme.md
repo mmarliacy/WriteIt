@@ -1,4 +1,4 @@
-# WRITEITDOWN - List your products before shopping !
+# WRITEIT - List your products before shopping !
 ##### *This README.md will allow you to know the features of the project, and will permit you to make changes later if necessary.*
 
 
@@ -79,4 +79,4 @@ This project follows the MVVM (Model-View-ViewModel) architecture using:
 ***
 #### 💻 Android Studio version
 ***
-> This project was made using Android Studio Ladybug | 2024.2.1 Patch 2.
+> This project was made using Android Studio Ladybug | 2024.2.1 Patch 2. 
