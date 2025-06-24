@@ -52,13 +52,10 @@ fun ProductItem(
         modifier = Modifier.
             fillMaxWidth()
             .padding(start = 10.dp, end = 10.dp)
-            .clickable {
-                onClickItem()
-            }.pointerInput(Unit){
-                detectTapGestures {
-                    onLongClickItem()
-                }
-            },
+            .combinedClickable(
+                onClick = { onClickItem() },
+                onLongClick = { onLongClickItem() }
+            ),
         shape = RoundedCornerShape(5.dp)
     ) {
         Row(

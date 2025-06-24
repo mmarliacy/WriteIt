@@ -98,7 +98,7 @@ class ProductsViewModel @Inject constructor(
             }
 
             //-------------------------------------------------------
-            //----> RESTORE ONE OR MANY PRODUCTS  -------------->>>>>
+            //----> ARCHIVE/DIS-ARCHIVE ONE OR MANY PRODUCTS  -------------->>>>>
             //-------------------------------------------------------
             is ProductsEvent.ArchiveProduct -> {
                 viewModelScope.launch {

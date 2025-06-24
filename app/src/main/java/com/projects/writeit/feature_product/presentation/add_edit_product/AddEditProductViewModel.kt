@@ -70,6 +70,18 @@ class AddEditProductViewModel @Inject constructor(
             val eventFlow = _eventFlow.asSharedFlow()
 
 
+    fun prepareForNewProduct() {
+        currentProductId = null
+        _productPrice.value = productPrice.value.copy(
+            priceText = ""
+        )
+        _productQuantity.value = productQuantity.value.copy(
+            quantityText = ""
+        )
+        _productName.value = productName.value.copy(
+            text = ""
+        )
+    }
     //---------------------------------------------------------------------------------------
     // -- ADD EDIT UI EVENT -->
     //------------------------------------
@@ -123,6 +135,7 @@ class AddEditProductViewModel @Inject constructor(
                     priceText = event.product.price.toString(),
                     isHintVisible = false
                 )
+
             }
 
 
@@ -144,19 +157,7 @@ class AddEditProductViewModel @Inject constructor(
                         } else {
                             _eventFlow.emit(UiEvent.ShowSnackBar("${productName.value.text} a été mis à jour"))
                         }
-
-
-                        // All texts fields reset
-
-                        _productPrice.value = productPrice.value.copy(
-                            priceText = ""
-                        )
-                        _productQuantity.value = productQuantity.value.copy(
-                            quantityText = ""
-                        )
-                        _productName.value = productName.value.copy(
-                            text = ""
-                        )
+                        prepareForNewProduct()
 
                     } catch(e: InvalidProductException){
                       _eventFlow.emit(
