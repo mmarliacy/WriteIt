@@ -25,9 +25,9 @@
 * [Selection Mode for deletion](screenshots/delete_selection_mode.png)
 * [No product to delete](screenshots/no_product_selected_to_delete.png)
 * [Add your product](screenshots/add_your_product.png)
-* [Filter to come](filter.png)
-* [Product got archived](screenshots.archive_action.png)
-* [Archived products list](screenshots.archived_list.png)
+* [Filter to come](screenshots/filter.png)
+* [Product got archived](screenshots/archive_action.png)
+* [Archived products list](screenshots/archived_list.png)
 
 ***
 #### Technologies used
