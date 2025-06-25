@@ -4,6 +4,10 @@ import com.projects.writeit.feature_product.domain.model.InvalidProductException
 import com.projects.writeit.feature_product.domain.model.Product
 import com.projects.writeit.feature_product.domain.repository.ProductRepository
 
+/**
+ * Use case qui permet d'ajouter un produit à la base de données locale.
+ * Appelle le repository avec un objet Product complet.
+ */
 class AddProduct(
     private val repository: ProductRepository
 ){

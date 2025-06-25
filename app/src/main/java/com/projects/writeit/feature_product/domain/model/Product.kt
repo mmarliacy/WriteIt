@@ -3,8 +3,6 @@ package com.projects.writeit.feature_product.domain.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-
-
 @Entity (tableName = "product_table")
 data class Product (
     @PrimaryKey
@@ -16,6 +14,8 @@ data class Product (
     val timestamp: Long,
     val isArchived: Boolean = false
 ){
+    /**
+     * Liste des catégories possible pour un produit.
     companion object {
         val categories = listOf(
             "Indéfini",
@@ -32,6 +32,7 @@ data class Product (
              "Sans catégorie",
         )
     }
+    */
 }
 
 class InvalidProductException(message: String): Exception(message)

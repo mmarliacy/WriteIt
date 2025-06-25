@@ -16,6 +16,16 @@ import androidx.compose.ui.unit.sp
 import com.projects.writeit.ui.theme.darkPrimaryColor
 import com.projects.writeit.ui.theme.latoFamily
 
+
+/**
+ * Champ de texte personnalisé sans bordure visible.
+ *
+ * Il affiche un texte d'aide (hint) quand le champ est vide et non sélectionné,
+ * selon la valeur de [isHintVisible].
+ *
+ * Ce champ utilise un style défini et réagit aux changements de focus et de texte.
+ **/
+
 @Composable
 fun TransparentTextField(
     text: String,

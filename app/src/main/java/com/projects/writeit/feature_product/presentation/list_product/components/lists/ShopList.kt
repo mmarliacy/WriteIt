@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditProductViewModel
 import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditProductEvent

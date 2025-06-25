@@ -221,7 +221,7 @@ class ProductsViewModel @Inject constructor(
     //---------------------------------------------
     private fun getArchivedProducts(productOrder: ProductOrder) {
         getArchivedProductsJob?.cancel()
-        getArchivedProductsJob = productUseCases.getArchivedProducts(productOrder).onEach {
+        getArchivedProductsJob = productUseCases.getArchivedProducts().onEach {
             _state.value = state.value.copy(
                 archivedProducts = it,
                 productsOrder = productOrder
