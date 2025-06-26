@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditProductViewModel
+import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditViewModel
 import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditProductEvent
 import com.projects.writeit.feature_product.presentation.list_product.ProductsViewModel
 import com.projects.writeit.feature_product.presentation.list_product.components.item.ProductItem
@@ -23,7 +23,7 @@ import com.projects.writeit.feature_product.presentation.list_product.util.Produ
 @Composable
 fun ShopList(
     viewModel: ProductsViewModel,
-    editViewModel: AddEditProductViewModel
+    editViewModel: AddEditViewModel
 ) {
     val state = viewModel.state.value
     val haptics = LocalHapticFeedback.current

@@ -39,13 +39,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditProductViewModel
-import com.projects.writeit.feature_product.presentation.add_edit_product.BottomAddEditDialog
+import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditViewModel
+import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditDialog
 import com.projects.writeit.feature_product.presentation.list_product.components.lists.ShopList
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.CustomHorizontalPager
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.CustomTabRow
-import com.projects.writeit.feature_product.presentation.list_product.components.tabs.TabItem
-import com.projects.writeit.feature_product.presentation.list_product.components.top_app_bar.SortDropDownMenu
+import com.projects.writeit.feature_product.presentation.list_product.components.tabs.util.TabItem
+import com.projects.writeit.feature_product.presentation.list_product.components.bottom_app_bar.SortDropDownMenu
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
 import com.projects.writeit.ui.theme.blackColor
 import com.projects.writeit.ui.theme.darkAccentColor
@@ -58,7 +58,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProductsScreen(
     viewModel: ProductsViewModel = hiltViewModel(),
-    editViewModel: AddEditProductViewModel = hiltViewModel(),
+    editViewModel: AddEditViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
 
@@ -78,7 +78,7 @@ fun ProductsScreen(
     ) {
         launch{
             editViewModel.eventFlow.collectLatest { event ->
-                if (event is AddEditProductViewModel.UiEvent.ShowSnackBar) {
+                if (event is AddEditViewModel.UiEvent.ShowSnackBar) {
                     scaffoldState.snackbarHostState.showSnackbar(event.message)
                 }
             }
@@ -155,17 +155,6 @@ fun ProductsScreen(
                         )
                     }
                     IconButton(onClick = {
-                        Log.d("SNACKBAR_EVENT", "Clic sur bouton test")
-                        viewModelScope.launch {
-                            viewModel.eventFlow.collectLatest {
-                                Log.d("SNACKBAR_EVENT", "Événement reçu en direct depuis bouton")
-                            }
-                        }
-
-                        // Appelle directement le snackbar
-                        viewModelScope.launch {
-                            viewModel._eventFlow.emit(ProductsViewModel.UiEvent.ShowSnackBar("Clic détecté"))
-                        }
                     }) {
                         Icon(
                             imageVector = Icons.Filled.EuroSymbol,
@@ -217,7 +206,7 @@ fun ProductsScreen(
     ) {
 
         if (state.showBottomSheet) {
-            BottomAddEditDialog(
+            AddEditDialog(
                 onDismiss = {
                     viewModel.onEvent(ProductsEvent.ToggleBottomDialog)
                             },

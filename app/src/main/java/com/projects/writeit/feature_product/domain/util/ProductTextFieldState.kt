@@ -8,7 +8,7 @@ package com.projects.writeit.feature_product.domain.util
  */
 data class ProductTextFieldState (
     val hint: String = "",
-    val text: String = "",
+    val nameText: String = "",
     val quantityText: String = "",
     val priceText : String = "",
     val quantity : Int = 0,

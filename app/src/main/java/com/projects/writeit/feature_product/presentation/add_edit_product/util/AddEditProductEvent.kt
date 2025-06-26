@@ -12,8 +12,8 @@ import com.projects.writeit.feature_product.domain.model.Product
  * la mise à jour d'un produit, et sa sauvegarde dans la base de données locale.
  */
 sealed class AddEditProductEvent{
-    data class EnteredTitle(val value: String) : AddEditProductEvent()
-    data class ChangeTitleFocus(val focusState: FocusState) : AddEditProductEvent()
+    data class EnteredName(val value: String) : AddEditProductEvent()
+    data class ChangeNameFocus(val focusState: FocusState) : AddEditProductEvent()
     data class EnteredQuantity(val value: String) : AddEditProductEvent()
     data class ChangeQuantityFocus(val focusState: FocusState) : AddEditProductEvent()
     data class EnteredPrice(val value: String) : AddEditProductEvent()
