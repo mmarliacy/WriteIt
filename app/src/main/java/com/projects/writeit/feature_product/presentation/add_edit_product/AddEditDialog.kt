@@ -63,7 +63,6 @@ fun AddEditDialog(
     val productQuantityState = viewModel.productQuantity.value
     val productPriceState = viewModel.productPrice.value
 
-
     //---------------------------------------------------------------------------------------
     // -> Effet lancé une seule fois à la composition du composable.
     // -> Il observe les événements émis par le ViewModel via `eventFlow`.

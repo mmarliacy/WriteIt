@@ -19,4 +19,5 @@ data class ProductsState(
     val showBottomSheet : Boolean = false,
     val isSelectionMode: Boolean = false,
     val buttonDeleteIsVisible: Boolean = false,
+    val sortDropDownExpanded: Boolean = false
 )

@@ -59,7 +59,7 @@ fun ArchivedProductItem(
                 modifier = Modifier.padding(start = 10.dp)
             )
             // -> Icône "+" sur laquelle on clique par la fonction `clickable()`
-            // pour sa ré-intégration dans la liste active.
+            // -> pour sa ré-intégration dans la liste active.
             Icon(
                 imageVector = Icons.Filled.AddCircle,
                 contentDescription = "",

@@ -29,6 +29,15 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
 
+/**
+ * ViewModel principal chargé de gérer l’état, les interactions et les événements liés aux produits
+ * (actifs ou archivés). Il utilise des StateFlows, MutableState et coroutines pour gérer :
+ *
+ * - La récupération, suppression, l'archivage ou la restauration des produits
+ * - La sélection multiple pour suppression
+ * - Le tri dynamique des produits
+ * - L’émission d’événements UI (snackbars)
+ */
 @HiltViewModel
 class ProductsViewModel @Inject constructor(
     private val productUseCases: ProductUseCases
@@ -42,21 +51,29 @@ class ProductsViewModel @Inject constructor(
     private var getActiveProductsJob: Job? = null
     private var getArchivedProductsJob: Job? = null
 
-    val _eventFlow = MutableSharedFlow<UiEvent>()
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    // Produit dont l'id est null et qio sert de réceptacle pour le produit à éditer.
     private val _productToEdit = mutableStateOf<Product?>(null)
     val productToEdit: State<Product?> = _productToEdit
 
-    fun productToEdit(product: Product){
+    fun productToEdit(product: Product) {
         _productToEdit.value = product
     }
 
+    // Au lancement du ViewModel, on récupère les produits actifs et archivés.
     init {
         getActiveProducts(productOrder = ProductOrder.Date(OrderType.AscendingOrder))
         getArchivedProducts(productOrder = ProductOrder.Date(OrderType.AscendingOrder))
     }
 
+    //---------------------------------------------------------------------------------------
+    // -- VIEW MODEL : FUNCTIONS -->
+    //------------------------------------
+
+    // Calcule la somme totale des produits actifs.
+    // Le calcul est mis à jour automatiquement via snapshotFlow et arrondi à 2 décimales.
     val totalPriceSum: StateFlow<Double> = snapshotFlow { state.value.selectableActiveProducts }
         .map { liste ->
             Log.i(
@@ -70,6 +87,49 @@ class ProductsViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, 0.0)
 
+
+    // Récupère les produits actifs depuis la couche UseCases,
+    // puis les transforme en liste de SelectableProduct pour l'UI.
+    private fun getActiveProducts(productOrder: ProductOrder) {
+        getActiveProductsJob?.cancel()
+        getActiveProductsJob = productUseCases.getProducts(productOrder).onEach {
+            val selectableList = it.map { product ->
+                SelectableProduct(product = product)
+            }
+            _state.value = state.value.copy(
+                selectableActiveProducts = selectableList,
+                productsOrder = productOrder
+            )
+        }.launchIn(viewModelScope)
+        Log.i("DEBUG", "Produits: ${state.value.selectableActiveProducts.map { it.product.name }}")
+    }
+
+    // Récupère les produits archivés.
+    private fun getArchivedProducts(productOrder: ProductOrder) {
+        getArchivedProductsJob?.cancel()
+        getArchivedProductsJob = productUseCases.getArchivedProducts().onEach {
+            _state.value = state.value.copy(
+                archivedProducts = it,
+                productsOrder = productOrder
+            )
+        }.launchIn(viewModelScope)
+        Log.i(
+            "ARCHIVE DEBUG",
+            "Produits archivés : ${state.value.selectableActiveProducts.map { it.product.name }}"
+        )
+    }
+
+    //---------------------------------------------------------------------------------------
+    // -- LISTS : UI EVENTS -->
+    // -----------------------------------
+    // - Gère tous les événements déclenchés depuis l’UI.
+    // - Chaque type d’événement correspond à une action spécifique sur l’état ou la base de données :
+    // - Tri, affichage du bottom sheet, menu de tri
+    // - Archivage, désarchivage
+    // - Restauration de produits
+    // - Activation/sélection pour suppression
+    // - Suppression définitive
+    //------------------------------------
     fun onEvent(event: ProductsEvent) {
         when (event) {
             is ProductsEvent.Order -> {
@@ -81,25 +141,18 @@ class ProductsViewModel @Inject constructor(
                 getActiveProducts(event.productOrder)
             }
 
-
-
-            is ProductsEvent.DeleteProduct -> {
-                viewModelScope.launch {
-                    productUseCases.deleteProduct(event.product)
-                    recentlyDeletedProduct = event.product
-                    _eventFlow.emit(UiEvent.ShowSnackBar("Produit supprimé"))
-                }
-            }
-
             is ProductsEvent.ToggleBottomDialog -> {
                 _state.value = state.value.copy(
                     showBottomSheet = !state.value.showBottomSheet
                 )
             }
 
-            //-------------------------------------------------------
-            //----> ARCHIVE/DIS-ARCHIVE ONE OR MANY PRODUCTS  -------------->>>>>
-            //-------------------------------------------------------
+            is ProductsEvent.ToggleSortDropDownMenu -> {
+                _state.value = state.value.copy(
+                    sortDropDownExpanded = !state.value.sortDropDownExpanded
+                )
+            }
+
             is ProductsEvent.ArchiveProduct -> {
                 viewModelScope.launch {
                     val archivedProduct = event.product.copy(isArchived = true)
@@ -116,9 +169,9 @@ class ProductsViewModel @Inject constructor(
                 }
             }
 
-            //-------------------------------------------------------
-            //----> RESTORE ONE OR MANY PRODUCTS  -------------->>>>>
-            //-------------------------------------------------------
+            // Restaure le dernier produit supprimé (stocké temporairement dans `recentlyDeletedProduct`).
+            // Réinsère le produit dans la base et réinitialise le cache local.
+            // Affiche une snackbar pour confirmer la restauration.
             is ProductsEvent.RestoreProduct -> {
                 viewModelScope.launch {
                     productUseCases.addProduct(recentlyDeletedProduct ?: return@launch)
@@ -127,6 +180,9 @@ class ProductsViewModel @Inject constructor(
                 }
             }
 
+            // Restaure tous les produits archivés en les marquant comme non archivés.
+            // Pour chaque produit, on l’insère de nouveau dans la base de données avec `isArchived = false`.
+            // Affiche une snackbar globale une fois l'opération terminée.
             is ProductsEvent.RestoreAllProducts -> {
                 viewModelScope.launch {
                     productUseCases.getArchivedProducts()
@@ -141,18 +197,17 @@ class ProductsViewModel @Inject constructor(
                 }
             }
 
-            //-------------------------------------------------------
-            //----> TOGGLE & HANDLE PRODUCTS TO DELETE --------->>>>>
-            //-------------------------------------------------------
-
+            // Active ou désactive le mode de sélection multiple pour la suppression.
+            // Lorsque activé, des cases à cocher apparaissent dans la liste des produits actifs.
             is ProductsEvent.ToggleProductSelectionMode -> {
                 _state.value = state.value.copy(
                     isSelectionMode = !state.value.isSelectionMode
                 )
             }
 
-
-
+            // Coche ou décoche un produit dans la liste des actifs pour une suppression multiple.
+            // Met à jour dynamiquement la liste avec l’état de chaque case à cocher.
+            // Affiche ou masque le bouton "Supprimer" selon la présence d’au moins un produit sélectionné.
             is ProductsEvent.ToggleProductSelection -> {
                 viewModelScope.launch {
                     val updatedList =
@@ -170,9 +225,9 @@ class ProductsViewModel @Inject constructor(
                     }
                 }
             }
-            //--------------------------------------------
-            //----> DELETE SELECTED PRODUCT --------->>>>>
-            //--------------------------------------------
+
+            // Supprime tous les produits sélectionnés,
+            // puis met à jour la liste et désactive le mode de sélection.
             is ProductsEvent.DeleteSelectedProducts -> {
                 viewModelScope.launch {
                     val selectedItemsList = state.value.selectableActiveProducts
@@ -199,43 +254,7 @@ class ProductsViewModel @Inject constructor(
         }
     }
 
-    //--------------------------------------------
-    //----> GET INITIAL PRODUCTS ------------>>>>>
-    //--------------------------------------------
-    private fun getActiveProducts(productOrder: ProductOrder) {
-        getActiveProductsJob?.cancel()
-        getActiveProductsJob = productUseCases.getProducts(productOrder).onEach {
-            val selectableList = it.map { product ->
-                SelectableProduct(product = product)
-            }
-            _state.value = state.value.copy(
-                selectableActiveProducts = selectableList,
-                productsOrder = productOrder
-            )
-        }.launchIn(viewModelScope)
-        Log.i("DEBUG", "Produits: ${state.value.selectableActiveProducts.map { it.product.name }}")
-    }
-
-    //---------------------------------------------
-    //----> GET ARCHIVED PRODUCTS ------------>>>>>
-    //---------------------------------------------
-    private fun getArchivedProducts(productOrder: ProductOrder) {
-        getArchivedProductsJob?.cancel()
-        getArchivedProductsJob = productUseCases.getArchivedProducts().onEach {
-            _state.value = state.value.copy(
-                archivedProducts = it,
-                productsOrder = productOrder
-            )
-        }.launchIn(viewModelScope)
-        Log.i(
-            "ARCHIVE DEBUG",
-            "Produits archivés : ${state.value.selectableActiveProducts.map { it.product.name }}"
-        )
-    }
-
-    //---------------------------------------------------------------------------------------
-    // -- ONE TIME UI EVENT -->
-    //------------------------------------
+    // Événements ponctuels envoyés à l’UI, comme l'affichage de snackbars.
     sealed class UiEvent {
         data class ShowSnackBar(val message: String) : UiEvent()
     }
