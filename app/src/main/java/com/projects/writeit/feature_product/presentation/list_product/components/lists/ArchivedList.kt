@@ -16,16 +16,32 @@ import com.projects.writeit.feature_product.presentation.list_product.ProductsVi
 import com.projects.writeit.feature_product.presentation.list_product.components.item.ArchivedProductItem
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
 
+/**
+ * Composable affichant la liste des produits archivés par l'utilisateur.
+ *
+ * Pour des performances optimales il est construit avec `LazyColumn` et `itemsIndexed()`.
+ *
+ * La méthode `AnimatedVisibility()` améliore l'expérience utilisateur, lors de l'apparition/disparition du produit.
+ *
+ * @param viewModel contient l'état de la liste et les actions utilisateur.
+ */
 @Composable
 fun ArchivedList(viewModel: ProductsViewModel) {
+
+    // -> Variable contenant l'état des produits archivés.
     val state = viewModel.state.value
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
+        // -> Méthode qui indexe chaque produit archivé et
+        // -> qui permet d'interagir individuellement avec chaque item.
         itemsIndexed(
             items = state.archivedProducts,
             itemContent = { _, archivedProduct ->
+                // -> Le produit rétrécit verticalement en 1 seconde pour un retour à la liste
+                // -> des produits actifs et se développe verticalement quand il est rajouté à nouveau.
                 AnimatedVisibility(
                     visible = state.isDeletedProductIsVisible,
                     enter = expandVertically(),
@@ -35,6 +51,9 @@ fun ArchivedList(viewModel: ProductsViewModel) {
                         modifier = Modifier
                             .fillMaxSize()
                     ) {
+                        // -> Réprésente le produit archivé sur lequel on agit.
+                        // -> Lors du clic sur l'icône de restauration, l’événement `DisArchiveProduct`
+                        // -> est déclenché pour le réintégrer dans la liste des produits actifs.
                         ArchivedProductItem(
                             product = archivedProduct,
                             onRestoreClick =

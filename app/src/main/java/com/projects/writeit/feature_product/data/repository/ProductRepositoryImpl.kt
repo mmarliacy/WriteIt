@@ -26,6 +26,6 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun deleteProduct(product: Product) {
-        productDao.deleteProduct(product)    }
-
+        productDao.deleteProduct(product)
+    }
 }
