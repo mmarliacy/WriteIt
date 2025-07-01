@@ -156,7 +156,7 @@ class ProductsViewModel @Inject constructor(
             is ProductsEvent.ArchiveProduct -> {
                 viewModelScope.launch {
                     val archivedProduct = event.product.copy(isArchived = true)
-                    productUseCases.addProduct(archivedProduct)
+                    productUseCases.insertProduct(archivedProduct)
                     _eventFlow.emit(UiEvent.ShowSnackBar("${archivedProduct.name} a été archivé"))
                 }
             }
@@ -164,7 +164,7 @@ class ProductsViewModel @Inject constructor(
             is ProductsEvent.DisArchiveProduct -> {
                 viewModelScope.launch {
                     val disArchiveProduct = event.product.copy(isArchived = false)
-                    productUseCases.addProduct(disArchiveProduct)
+                    productUseCases.insertProduct(disArchiveProduct)
                     _eventFlow.emit(UiEvent.ShowSnackBar("${disArchiveProduct.name} est de nouveau dans ta liste"))
                 }
             }
@@ -174,7 +174,7 @@ class ProductsViewModel @Inject constructor(
             // Affiche une snackbar pour confirmer la restauration.
             is ProductsEvent.RestoreProduct -> {
                 viewModelScope.launch {
-                    productUseCases.addProduct(recentlyDeletedProduct ?: return@launch)
+                    productUseCases.insertProduct(recentlyDeletedProduct ?: return@launch)
                     recentlyDeletedProduct = null
                     _eventFlow.emit(UiEvent.ShowSnackBar("Produit remis dans la liste"))
                 }
@@ -191,7 +191,7 @@ class ProductsViewModel @Inject constructor(
                             val productToRestore = oldProduct.copy(
                                 isArchived = false
                             )
-                            productUseCases.addProduct(productToRestore)
+                            productUseCases.insertProduct(productToRestore)
                         }
                     _eventFlow.emit(UiEvent.ShowSnackBar("Tous les produits ont été restaurés"))
                 }

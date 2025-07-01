@@ -158,7 +158,7 @@ class AddEditViewModel @Inject constructor(
             is AddEditProductEvent.SaveProduct -> {
                 viewModelScope.launch {
                     try {
-                        productUseCases.addProduct(
+                        productUseCases.insertProduct(
                             Product(
                                 id = currentProductId,
                                 name = productName.value.nameText,

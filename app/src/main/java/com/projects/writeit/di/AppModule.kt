@@ -5,7 +5,7 @@ import androidx.room.Room
 import com.projects.writeit.feature_product.data.data_source.ProductDatabase
 import com.projects.writeit.feature_product.data.repository.ProductRepositoryImpl
 import com.projects.writeit.feature_product.domain.repository.ProductRepository
-import com.projects.writeit.feature_product.domain.use_case.single_use_case.AddProduct
+import com.projects.writeit.feature_product.domain.use_case.single_use_case.InsertProduct
 import com.projects.writeit.feature_product.domain.use_case.single_use_case.DeleteProduct
 import com.projects.writeit.feature_product.domain.use_case.single_use_case.GetProducts
 import com.projects.writeit.feature_product.domain.use_case.ProductUseCases
@@ -45,7 +45,7 @@ object AppModule {
             getProducts = GetProducts(repository),
             getArchivedProducts = GetArchivedProducts(repository),
             deleteProduct = DeleteProduct(repository),
-            addProduct = AddProduct(repository),
+            insertProduct = InsertProduct(repository),
             getProduct = GetProduct(repository)
         )
     }
