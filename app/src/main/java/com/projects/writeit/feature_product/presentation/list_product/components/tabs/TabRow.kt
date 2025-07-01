@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.projects.writeit.feature_product.presentation.list_product.components.tabs.util.TabItem
 import com.projects.writeit.ui.theme.darkAccentColor
 import com.projects.writeit.ui.theme.secondaryText
 import com.projects.writeit.ui.theme.whiteColor

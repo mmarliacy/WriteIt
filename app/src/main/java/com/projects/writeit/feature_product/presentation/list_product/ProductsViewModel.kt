@@ -81,16 +81,6 @@ class ProductsViewModel @Inject constructor(
                 getActiveProducts(event.productOrder)
             }
 
-
-
-            is ProductsEvent.DeleteProduct -> {
-                viewModelScope.launch {
-                    productUseCases.deleteProduct(event.product)
-                    recentlyDeletedProduct = event.product
-                    _eventFlow.emit(UiEvent.ShowSnackBar("Produit supprimé"))
-                }
-            }
-
             is ProductsEvent.ToggleBottomDialog -> {
                 _state.value = state.value.copy(
                     showBottomSheet = !state.value.showBottomSheet
@@ -103,7 +93,7 @@ class ProductsViewModel @Inject constructor(
             is ProductsEvent.ArchiveProduct -> {
                 viewModelScope.launch {
                     val archivedProduct = event.product.copy(isArchived = true)
-                    productUseCases.addProduct(archivedProduct)
+                    productUseCases.pInsertProduct(archivedProduct)
                     _eventFlow.emit(UiEvent.ShowSnackBar("${archivedProduct.name} a été archivé"))
                 }
             }
@@ -111,7 +101,7 @@ class ProductsViewModel @Inject constructor(
             is ProductsEvent.DisArchiveProduct -> {
                 viewModelScope.launch {
                     val disArchiveProduct = event.product.copy(isArchived = false)
-                    productUseCases.addProduct(disArchiveProduct)
+                    productUseCases.pInsertProduct(disArchiveProduct)
                     _eventFlow.emit(UiEvent.ShowSnackBar("${disArchiveProduct.name} est de nouveau dans ta liste"))
                 }
             }
@@ -121,7 +111,7 @@ class ProductsViewModel @Inject constructor(
             //-------------------------------------------------------
             is ProductsEvent.RestoreProduct -> {
                 viewModelScope.launch {
-                    productUseCases.addProduct(recentlyDeletedProduct ?: return@launch)
+                    productUseCases.pInsertProduct(recentlyDeletedProduct ?: return@launch)
                     recentlyDeletedProduct = null
                     _eventFlow.emit(UiEvent.ShowSnackBar("Produit remis dans la liste"))
                 }
@@ -135,7 +125,7 @@ class ProductsViewModel @Inject constructor(
                             val productToRestore = oldProduct.copy(
                                 isArchived = false
                             )
-                            productUseCases.addProduct(productToRestore)
+                            productUseCases.pInsertProduct(productToRestore)
                         }
                     _eventFlow.emit(UiEvent.ShowSnackBar("Tous les produits ont été restaurés"))
                 }
@@ -196,6 +186,8 @@ class ProductsViewModel @Inject constructor(
 
                 }
             }
+
+            ProductsEvent.ToggleSortDropDownMenu -> TODO()
         }
     }
 
@@ -221,7 +213,7 @@ class ProductsViewModel @Inject constructor(
     //---------------------------------------------
     private fun getArchivedProducts(productOrder: ProductOrder) {
         getArchivedProductsJob?.cancel()
-        getArchivedProductsJob = productUseCases.getArchivedProducts(productOrder).onEach {
+        getArchivedProductsJob = productUseCases.getArchivedProducts().onEach {
             _state.value = state.value.copy(
                 archivedProducts = it,
                 productsOrder = productOrder

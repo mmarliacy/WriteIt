@@ -4,7 +4,7 @@ import com.projects.writeit.feature_product.domain.model.InvalidProductException
 import com.projects.writeit.feature_product.domain.model.Product
 import com.projects.writeit.feature_product.domain.repository.ProductRepository
 
-class AddProduct(
+class InsertProduct(
     private val repository: ProductRepository
 ){
         @Throws(InvalidProductException::class)
