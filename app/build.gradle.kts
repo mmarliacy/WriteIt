@@ -40,6 +40,11 @@ android {
     buildFeatures {
         compose = true
     }
+    packaging {
+        resources {
+            excludes += "/META-INF/{LICENSE.md,LICENSE-notice.md}"
+        }
+    }
 }
 // New implementation
 dependencies {
@@ -86,6 +91,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     testImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.android.compiler)
 
     // Compose dependencies
     implementation(libs.androidx.lifecycle.viewmodel.compose.v240beta01)

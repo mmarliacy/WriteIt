@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -128,6 +129,7 @@ fun AddEditDialog(
             //------------------------------------
 
             TransparentTextField(
+                modifier = modifier.testTag("nameText"),
                 text = productNameState.nameText,
                 hint = productNameState.hint,
                 onValueChange = { productName ->
@@ -145,6 +147,7 @@ fun AddEditDialog(
 
             // -> Champ pour saisir la quantité.
             TransparentTextField(
+                modifier = modifier.testTag("quantityText"),
                 text = productQuantityState.quantityText,
                 hint = productQuantityState.hint,
                 onValueChange = { productQuantity ->
@@ -170,6 +173,7 @@ fun AddEditDialog(
 
             // -> Champ pour saisir le prix.
             TransparentTextField(
+                modifier = modifier.testTag("priceText"),
                 text = productPriceState.priceText,
                 hint = productPriceState.hint,
                 onValueChange = { productPrice ->
