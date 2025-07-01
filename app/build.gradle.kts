@@ -84,6 +84,8 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test)
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.mockk)
+    androidTestImplementation(libs.mockk.android)
 
     // Compose dependencies
     implementation(libs.androidx.lifecycle.viewmodel.compose.v240beta01)

@@ -10,6 +10,7 @@ coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+mockk = "1.13.10"
 kotlinxCoroutinesAndroid = "1.7.3"
 kotlinxCoroutinesCore = "1.5.0"
 lifecycleRuntimeKtx = "2.8.7"
@@ -44,6 +45,8 @@ kotlinx-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serializat
 androidx-room-compiler-v230 = { module = "androidx.room:room-compiler", version.ref = "roomCompilerVersion" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 androidx-ui-test = { module = "androidx.compose.ui:ui-test" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroidVersion" }
