@@ -1,7 +1,5 @@
 package com.projects.writeit.feature_product.domain.util
 
-import java.lang.Error
-
 /**
  * Classe de données représentant l'état d'un champ de texte personnalisé.
  *
