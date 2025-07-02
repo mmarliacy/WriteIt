@@ -4,11 +4,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.projects.writeit.feature_product.domain.model.InvalidProductException
 import com.projects.writeit.feature_product.domain.model.Product
 import com.projects.writeit.feature_product.domain.use_case.ProductUseCases
+import com.projects.writeit.feature_product.domain.util.InvalidProductException
 import com.projects.writeit.feature_product.domain.util.ProductTextFieldState
 import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditProductEvent
+import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditProductState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -31,6 +32,10 @@ class AddEditViewModel @Inject constructor(
 
     private var currentProductId: Int? = null
 
+    private val _state = mutableStateOf(
+        AddEditProductState()
+    )
+    val state : State<AddEditProductState> = _state
 
     // -- Etat du nom du produit (modifiable + lecture seule).
     private val _productName = mutableStateOf(
@@ -79,6 +84,66 @@ class AddEditViewModel @Inject constructor(
         _productName.value = productName.value.copy(
             nameText = ""
         )
+        // Efface tous les messages d'erreurs précédents, pour les nouvelles entrées.
+        _state.value = state.value.copy(
+            nameError = null,
+            priceError = null,
+            quantityError = null
+        )
+    }
+
+    //---------------------------------------------------------------------------------------
+    // -- HANDLING FORM ERRORS -->
+    //------------------------------------
+
+    // Le rôle de cette fonction est de vérifier le nom du produit
+    // S'il est vide `nameError` est mit à jour pour que l'erreur apparaisse au niveau de l'UI
+    private fun checkName(nameToCheck : String) : String{
+        if (nameToCheck.isBlank()) {
+            _state.value = state.value.copy(
+                nameError = "Veuillez renseigner un nom de produit"
+            )
+        } else if (nameToCheck.isNotBlank()) {
+            _state.value = state.value.copy(
+                nameError = null
+            )
+        }
+        return nameToCheck
+    }
+
+    // Le rôle de cette fonction est de vérifier la quantité du produit.
+    // S'il est vide `nameError` est mit à jour pour que l'erreur apparaisse au niveau de l'UI
+    private fun checkQuantity(quantityToCheck : String) : String {
+        if (quantityToCheck.isBlank()) {
+            _state.value = state.value.copy(
+                quantityError = "Veuillez renseigner la quantité"
+            )
+        } else if (quantityToCheck.isNotBlank()) {
+            _state.value = state.value.copy(
+                quantityError = null
+            )
+        }
+        return quantityToCheck
+    }
+
+    // Le rôle de cette fonction est de vérifier le prix du produit et de le normaliser au besoin
+    // S'il est vide `priceError` est mit à jour pour que l'erreur apparaisse au niveau de l'UI
+    private fun checkPrice(priceToCheck : String) : String {
+        val normalized: String
+        if (priceToCheck.contains(",")) {
+            // On remplace toute virgule par un point
+            normalized = priceToCheck.replace(",", ".").trim()
+            return normalized
+        } else if (priceToCheck.isBlank()) {
+            _state.value = state.value.copy(
+                priceError = "Veuillez renseigner le prix"
+            )
+        } else if (priceToCheck.isNotBlank()) {
+            _state.value = state.value.copy(
+                priceError = null
+            )
+        }
+        return priceToCheck
     }
 
     //---------------------------------------------------------------------------------------
@@ -158,13 +223,18 @@ class AddEditViewModel @Inject constructor(
             is AddEditProductEvent.SaveProduct -> {
                 viewModelScope.launch {
                     try {
+                        // Vérifier toutes les valeurs et les valider à travers les fonctions de checking.
+                        val checkedName = checkName(productName.value.nameText)
+                        val checkedPrice = checkPrice(productPrice.value.priceText)
+                        val checkedQuantity = checkQuantity(productQuantity.value.quantityText)
+
                         productUseCases.insertProduct(
                             Product(
                                 id = currentProductId,
-                                name = productName.value.nameText,
+                                name = checkedName,
                                 timestamp = System.currentTimeMillis(),
-                                quantity = productQuantity.value.quantityText.toInt(),
-                                price = productPrice.value.priceText.toDouble()
+                                quantity = checkedQuantity.toInt(),
+                                price = checkedPrice.toDouble()
                             )
                         )
                         _eventFlow.emit(UiEvent.SaveProduct)
@@ -181,6 +251,8 @@ class AddEditViewModel @Inject constructor(
                                 message = e.message ?: "Produit non ajouté"
                             )
                         )
+                    }catch (e: NumberFormatException) {
+                        _eventFlow.emit(UiEvent.ShowSnackBar(message = e.message ?: "Produit non ajouté"))
                     }
                 }
             }

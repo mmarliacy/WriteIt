@@ -1,6 +1,7 @@
 package com.projects.writeit.feature_product.presentation.add_edit_product
 
 
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ModalBottomSheet
@@ -58,6 +58,8 @@ fun AddEditDialog(
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+
+    val state = viewModel.state.value
 
     // -- Etats des caractéristiques du produit utilisable en lecture seule dans l'UI, provenant du View Model.
     val productNameState = viewModel.productName.value
@@ -125,7 +127,8 @@ fun AddEditDialog(
             //---------------------------------------------------------------------------------------
             // -- CHAMPS DE TEXTE A REMPLIR -->
             // -> Champs de texte reliés au ViewModel des événements,
-            // -> qui permettent de saisir le nom, la quantité, et le prix d'un produit
+            // -> qui permettent de saisir le nom, la quantité, et le prix d'un produit,
+            // -- Selon des conditions (error) définies (Non vide, > 0) qui filtre les erreurs.
             //------------------------------------
 
             TransparentTextField(
@@ -139,8 +142,11 @@ fun AddEditDialog(
                     viewModel.onEvent(AddEditProductEvent.ChangeNameFocus(productName))
                 },
                 isHintVisible = productNameState.isHintVisible,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-            )
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                isError = state.nameError != null,
+                supportingErrorText = state.nameError
+                )
+
             Spacer(
                 modifier = Modifier.height(5.dp)
             )
@@ -165,7 +171,9 @@ fun AddEditDialog(
                         )
                     )
                 },
-                isHintVisible = productQuantityState.isHintVisible
+                isHintVisible = productQuantityState.isHintVisible,
+                isError = state.quantityError != null,
+                supportingErrorText = state.quantityError
             )
             Spacer(
                 modifier = Modifier.height(5.dp)
@@ -183,7 +191,9 @@ fun AddEditDialog(
                 onFocusChange = { productPrice ->
                     viewModel.onEvent(AddEditProductEvent.ChangePriceFocus(productPrice))
                 },
-                isHintVisible = productPriceState.isHintVisible
+                isHintVisible = productPriceState.isHintVisible,
+                isError = state.priceError != null,
+                supportingErrorText = state.priceError
             )
         }
         Row(

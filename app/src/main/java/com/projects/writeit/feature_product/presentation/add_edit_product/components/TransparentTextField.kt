@@ -2,9 +2,10 @@ package com.projects.writeit.feature_product.presentation.add_edit_product.compo
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
@@ -41,12 +42,14 @@ fun TransparentTextField(
     ),
     keyboardOptions: (KeyboardOptions),
     singleLine: Boolean = false,
-    onFocusChange: (FocusState) -> Unit
+    onFocusChange: (FocusState) -> Unit,
+    isError: Boolean = false,
+    supportingErrorText : String? = null
 ) {
     Box(
         modifier = modifier
     ) {
-        BasicTextField(
+        TextField(
             value = text,
             onValueChange = onValueChange,
             singleLine = singleLine,
@@ -56,7 +59,17 @@ fun TransparentTextField(
                 .fillMaxWidth()
                 .onFocusChanged {
                     onFocusChange(it)
+                },
+            isError = isError,
+            supportingText = {
+                if (supportingErrorText != null) {
+                    Text(
+                        text = supportingErrorText,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
+            }
         )
         if(isHintVisible){
             Text(

@@ -109,6 +109,7 @@ fun ProductsScreen(
         launch {
             editViewModel.eventFlow.collectLatest { event ->
                 if (event is AddEditViewModel.UiEvent.ShowSnackBar) {
+
                     scaffoldState.snackbarHostState.showSnackbar(event.message)
                 }
             }
