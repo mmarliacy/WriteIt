@@ -84,7 +84,7 @@ fun ShopList(
                             if (it != viewModel.productToEdit.value?.id) {
                                 viewModel.productToEdit(product = selectableProduct.product)
                                 editViewModel.onEvent(
-                                    AddEditProductEvent.InitProduct(
+                                    AddEditProductEvent.GetProductToEdit(
                                         product = selectableProduct.product
                                     )
                                 )

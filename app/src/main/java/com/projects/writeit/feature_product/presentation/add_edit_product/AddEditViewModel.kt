@@ -10,6 +10,7 @@ import com.projects.writeit.feature_product.domain.util.InvalidProductException
 import com.projects.writeit.feature_product.domain.util.ProductTextFieldState
 import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditProductEvent
 import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditProductState
+import com.projects.writeit.feature_product.presentation.list_product.ProductsViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -27,7 +28,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AddEditViewModel @Inject constructor(
-    private val productUseCases: ProductUseCases
+    private val productUseCases: ProductUseCases,
+    private val productViewModel: ProductsViewModel
 ) : ViewModel() {
 
     private var currentProductId: Int? = null
@@ -35,7 +37,7 @@ class AddEditViewModel @Inject constructor(
     private val _state = mutableStateOf(
         AddEditProductState()
     )
-    val state : State<AddEditProductState> = _state
+    val state: State<AddEditProductState> = _state
 
     // -- Etat du nom du produit (modifiable + lecture seule).
     private val _productName = mutableStateOf(
@@ -92,13 +94,28 @@ class AddEditViewModel @Inject constructor(
         )
     }
 
+    // -> On ajoute le produit édité suivi de l'animation.
+    // -- Fermer le dialogue et émettre un message dans l'UI en préparant le formulaire à un nouvel ajout/update.
+    private suspend fun saveProductAndCloseDialog(message : String, product: Product) {
+        productUseCases.insertProduct(product)
+        _eventFlow.emit(UiEvent.ExitTheDialog)
+        _eventFlow.emit(UiEvent.ShowSnackBar(message))
+        prepareForNewProduct()
+    }
+    // -> Le rôle de cette fonction est de fermer le dialogue et
+    // -- d'émettre un message dans l'UI en fonction de la logique donnée.
+    private suspend fun emitExitWithMessage(message : String) {
+        _eventFlow.emit(UiEvent.ExitTheDialog)
+        _eventFlow.emit(UiEvent.ShowSnackBar(message))
+    }
+
     //---------------------------------------------------------------------------------------
     // -- HANDLING FORM ERRORS -->
     //------------------------------------
 
     // Le rôle de cette fonction est de vérifier le nom du produit
     // S'il est vide `nameError` est mit à jour pour que l'erreur apparaisse au niveau de l'UI
-    private fun checkName(nameToCheck : String) : String{
+    private fun checkName(nameToCheck: String): String {
         if (nameToCheck.isBlank()) {
             _state.value = state.value.copy(
                 nameError = "Veuillez renseigner un nom de produit"
@@ -113,7 +130,7 @@ class AddEditViewModel @Inject constructor(
 
     // Le rôle de cette fonction est de vérifier la quantité du produit.
     // S'il est vide `nameError` est mit à jour pour que l'erreur apparaisse au niveau de l'UI
-    private fun checkQuantity(quantityToCheck : String) : String {
+    private fun checkQuantity(quantityToCheck: String): String {
         if (quantityToCheck.isBlank()) {
             _state.value = state.value.copy(
                 quantityError = "Veuillez renseigner la quantité"
@@ -128,7 +145,7 @@ class AddEditViewModel @Inject constructor(
 
     // Le rôle de cette fonction est de vérifier le prix du produit et de le normaliser au besoin
     // S'il est vide `priceError` est mit à jour pour que l'erreur apparaisse au niveau de l'UI
-    private fun checkPrice(priceToCheck : String) : String {
+    private fun checkPrice(priceToCheck: String): String {
         val normalized: String
         if (priceToCheck.contains(",")) {
             // On remplace toute virgule par un point
@@ -149,7 +166,6 @@ class AddEditViewModel @Inject constructor(
     //---------------------------------------------------------------------------------------
     // -- ADD / EDIT : UI EVENTS -->
     //------------------------------------
-
     fun onEvent(event: AddEditProductEvent) {
         when (event) {
 
@@ -202,7 +218,7 @@ class AddEditViewModel @Inject constructor(
             }
 
             // -> Reprendre et remplir le formulaire avec les données du produit à modifier.
-            is AddEditProductEvent.InitProduct -> {
+            is AddEditProductEvent.GetProductToEdit -> {
                 currentProductId = event.product.id
                 _productName.value = productName.value.copy(
                     nameText = event.product.name,
@@ -227,32 +243,52 @@ class AddEditViewModel @Inject constructor(
                         val checkedName = checkName(productName.value.nameText)
                         val checkedPrice = checkPrice(productPrice.value.priceText)
                         val checkedQuantity = checkQuantity(productQuantity.value.quantityText)
-
-                        productUseCases.insertProduct(
-                            Product(
-                                id = currentProductId,
-                                name = checkedName,
-                                timestamp = System.currentTimeMillis(),
-                                quantity = checkedQuantity.toInt(),
-                                price = checkedPrice.toDouble()
-                            )
+                        val editedProduct = Product(
+                            id = currentProductId,
+                            name = checkedName,
+                            timestamp = System.currentTimeMillis(),
+                            quantity = checkedQuantity.toInt(),
+                            price = checkedPrice.toDouble()
                         )
-                        _eventFlow.emit(UiEvent.SaveProduct)
                         if (currentProductId == null) {
-                            _eventFlow.emit(UiEvent.ShowSnackBar("${productName.value.nameText} a été ajouté à la liste"))
+                            // -- Si l'id est nul (nouveau produit), on l'ajoute, clôture le dialogue
+                            // -- et prépare le formulaire pour un nouvel ajout.
+                            saveProductAndCloseDialog(
+                                message = "${productName.value.nameText} a été ajouté à la liste",
+                                product = editedProduct)
                         } else {
-                            _eventFlow.emit(UiEvent.ShowSnackBar("${productName.value.nameText} a été mis à jour"))
+                            // -- Si l'id n'est pas nul (produit existant), on récupère le produit original stocké dans le ProductViewModel.
+                            // -- Le timestamp (de création) étant différent on en copie la valeur pour comparé le produit original à celui qu'on a édité.
+                            // -- Si les autres constantes n'ont pas changés, on revient à la liste et on annule l'opération.
+                            // -- Si au moins une constante a changée, on insère le produit modifié.
+                            val originalProduct = productViewModel.productToEdit.value
+                            if (originalProduct != null) {
+                                val originalForCompare =
+                                    originalProduct.copy(timestamp = editedProduct.timestamp)
+                                if (editedProduct == originalForCompare) {
+                                    emitExitWithMessage("Aucune modification sur le produit.")
+                                } else {
+                                    saveProductAndCloseDialog(
+                                        message = "${productName.value.nameText} a été mis à jour",
+                                        product = editedProduct)
+                                }
+                            } else {
+                                // Pas de produit original en édition
+                                emitExitWithMessage("Impossible de retrouver le produit d’origine")
+                            }
                         }
-                        prepareForNewProduct()
-
                     } catch (e: InvalidProductException) {
                         _eventFlow.emit(
                             UiEvent.ShowSnackBar(
                                 message = e.message ?: "Produit non ajouté"
                             )
                         )
-                    }catch (e: NumberFormatException) {
-                        _eventFlow.emit(UiEvent.ShowSnackBar(message = e.message ?: "Produit non ajouté"))
+                    } catch (e: NumberFormatException) {
+                        _eventFlow.emit(
+                            UiEvent.ShowSnackBar(
+                                message = e.message ?: "Produit non ajouté"
+                            )
+                        )
                     }
                 }
             }
@@ -264,7 +300,7 @@ class AddEditViewModel @Inject constructor(
      */
     sealed class UiEvent {
         data class ShowSnackBar(val message: String) : UiEvent()
-        data object SaveProduct : UiEvent()
+        data object ExitTheDialog : UiEvent()
     }
 }
 

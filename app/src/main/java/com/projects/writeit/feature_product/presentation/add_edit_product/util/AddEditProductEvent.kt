@@ -18,6 +18,6 @@ sealed class AddEditProductEvent{
     data class ChangeQuantityFocus(val focusState: FocusState) : AddEditProductEvent()
     data class EnteredPrice(val value: String) : AddEditProductEvent()
     data class ChangePriceFocus(val focusState: FocusState) : AddEditProductEvent()
-    data class InitProduct(val product : Product) : AddEditProductEvent()
+    data class GetProductToEdit(val product : Product) : AddEditProductEvent()
     data object SaveProduct : AddEditProductEvent()
 }
