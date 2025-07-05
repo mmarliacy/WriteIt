@@ -206,7 +206,7 @@ fun AddEditDialog(
 
             // -> Bouton "OK" personnalisé pour enregistrer le produit dans la base de données locale.
             CustomButton {
-                viewModel.onEvent(AddEditProductEvent.SaveProduct())
+                viewModel.onEvent(AddEditProductEvent.SaveProduct)
             }
         }
     }
