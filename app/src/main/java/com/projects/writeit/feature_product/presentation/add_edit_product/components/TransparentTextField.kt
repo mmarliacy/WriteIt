@@ -6,10 +6,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -69,7 +71,15 @@ fun TransparentTextField(
                         color = MaterialTheme.colorScheme.error
                     )
                 }
-            }
+            },
+            colors = TextFieldDefaults.colors(
+                disabledContainerColor = Color.White,
+                disabledTextColor = MaterialTheme.colorScheme.onBackground,
+                disabledLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                disabledIndicatorColor = MaterialTheme.colorScheme.primary
+            ),
+            readOnly = false,
+            enabled = true
         )
         if(isHintVisible){
             Text(

@@ -21,6 +21,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -98,6 +99,8 @@ fun ProductsScreen(
     // -> Etat du conteneur de l'écran.
     val scaffoldState = rememberScaffoldState()
 
+    val productToEdit = viewModel.productToEdit.value
+
 
     //---------------------------------------------------------------------------------------
     // -> Effet lancé une seule fois lors de la 1ère composition.
@@ -118,8 +121,24 @@ fun ProductsScreen(
             viewModel.eventFlow.collectLatest { event ->
                 if (event is ProductsViewModel.UiEvent.ShowSnackBar) {
                     Log.d("SNACKBAR_EVENT", "Message reçu : ${event.message}")
-                    scaffoldState.snackbarHostState.showSnackbar(event.message)
+                     val result = scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.message,
+                        actionLabel = "Annuler")
+
+                    when(result){
+                       SnackbarResult.ActionPerformed -> {
+                            viewModel.onEvent(ProductsEvent.RestoreProduct)
+                       }
+                    SnackbarResult.Dismissed -> {
+                        scaffoldState.snackbarHostState
+                    }
+                    }
                 }
+            }
+        }
+        launch {
+            productToEdit?.let {
+                editViewModel.initWithExistingProduct(it)
             }
         }
     }

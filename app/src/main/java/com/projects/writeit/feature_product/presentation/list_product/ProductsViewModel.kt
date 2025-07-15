@@ -48,8 +48,9 @@ class ProductsViewModel @Inject constructor(
     private val _state = mutableStateOf(ProductsState())
     val state: State<ProductsState> = _state
 
-    // Produit récemment supprimé à ré-intégrer dans une méthode "UNDO" -> TODO ()
-    private var recentlyDeletedProduct: Product? = null
+    // Produits récemment supprimé à ré-intégrer dans la liste par le biais du SnackBar.
+    private var itemsToDelete : List<Product>? = null
+
 
     // Travail asynchrone qui permet de contrôler la récupération de la liste des produits (actifs/archivés).
     private var getActiveProductsJob: Job? = null
@@ -201,9 +202,10 @@ class ProductsViewModel @Inject constructor(
             // Affiche un snackbar pour confirmer la restauration.
             is ProductsEvent.RestoreProduct -> {
                 viewModelScope.launch {
-                    productUseCases.insertProduct(recentlyDeletedProduct ?: return@launch)
-                    recentlyDeletedProduct = null
-                    _eventFlow.emit(UiEvent.ShowSnackBar("Produit remis dans la liste"))
+                    itemsToDelete?.forEach {
+                        productUseCases.insertProduct(it)
+                    }
+                    itemsToDelete = null
                 }
             }
 
@@ -258,17 +260,17 @@ class ProductsViewModel @Inject constructor(
             is ProductsEvent.DeleteSelectedProducts -> {
                 viewModelScope.launch {
                     var undeletedProducts = 0
-                    val itemsToDelete = state.value.selectableActiveProducts
+                    itemsToDelete = state.value.selectableActiveProducts
                         .filter { it.isChecked }.map {
                             it.product
                         }
                     // -> Si aucun item n'est sélectionné, on le notifie à l'utilisateur
-                    if (itemsToDelete.isEmpty()) {
+                    if (itemsToDelete!!.isEmpty()) {
                         _eventFlow.emit(UiEvent.ShowSnackBar("Sélectionnez au moins un produit à supprimer"))
                     } else {
-                        var updatedList : List<SelectableProduct> = emptyList()
+                        var updatedList : List<SelectableProduct>? = emptyList()
 
-                        itemsToDelete.forEach {
+                        itemsToDelete!!.forEach {
                             try {
                                 productUseCases.deleteProduct(it)
                             } catch (e: Exception) {
@@ -286,19 +288,19 @@ class ProductsViewModel @Inject constructor(
                                 isSelectionMode = false,
                                 buttonDeleteIsVisible = false
                             )
-                            _eventFlow.emit(UiEvent.ShowSnackBar("${itemsToDelete.size - undeletedProducts} produit(s) supprimé(s)"))
+                            _eventFlow.emit(UiEvent.ShowSnackBar("${itemsToDelete!!.size - undeletedProducts} produit(s) supprimé(s)"))
                         } else {
-                            // Liste des produits non sélectionnés pour la suppression
+                            // Liste des produits dont la suppression à échouer
                             // qu'on souhaite récupérer pour une nouvelle suppression
                             val failedProducts = state.value.selectableActiveProducts
                                 .filter {it.isChecked}
                                 .map {it.product}
                             _state.value = state.value.copy(
-                                selectableActiveProducts = updatedList,
+                                selectableActiveProducts = updatedList!!,
                                 isSelectionMode = failedProducts.isNotEmpty(),  // Reste en mode selection si erreurs
                                 buttonDeleteIsVisible = failedProducts.isNotEmpty()
                             )
-                            _eventFlow.emit(UiEvent.ShowSnackBar("${itemsToDelete.size - undeletedProducts} produit(s) supprimé(s), $undeletedProducts en échec"))
+                            _eventFlow.emit(UiEvent.ShowSnackBar("${itemsToDelete!!.size - undeletedProducts} produit(s) supprimé(s), $undeletedProducts en échec"))
                         }
 
                     }

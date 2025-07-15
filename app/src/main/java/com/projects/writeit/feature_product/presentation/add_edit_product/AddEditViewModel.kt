@@ -10,7 +10,6 @@ import com.projects.writeit.feature_product.domain.util.InvalidProductException
 import com.projects.writeit.feature_product.domain.util.ProductTextFieldState
 import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditProductEvent
 import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditProductState
-import com.projects.writeit.feature_product.presentation.list_product.ProductsViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -29,7 +28,6 @@ import javax.inject.Inject
 @HiltViewModel
 class AddEditViewModel @Inject constructor(
     private val productUseCases: ProductUseCases,
-    private val productViewModel: ProductsViewModel
 ) : ViewModel() {
 
     private var currentProductId: Int? = null
@@ -69,6 +67,8 @@ class AddEditViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    private var originalProduct : Product? = null
+
 
     //---------------------------------------------------------------------------------------
     // -- VIEW MODEL FUNCTIONS -->
@@ -107,6 +107,11 @@ class AddEditViewModel @Inject constructor(
     private suspend fun emitExitWithMessage(message : String) {
         _eventFlow.emit(UiEvent.ExitTheDialog)
         _eventFlow.emit(UiEvent.ShowSnackBar(message))
+    }
+
+    fun initWithExistingProduct(product: Product) {
+        // stocke-le si nécessaire
+        originalProduct = product
     }
 
     //---------------------------------------------------------------------------------------
@@ -261,10 +266,9 @@ class AddEditViewModel @Inject constructor(
                             // -- Le timestamp (de création) étant différent on en copie la valeur pour comparé le produit original à celui qu'on a édité.
                             // -- Si les autres constantes n'ont pas changés, on revient à la liste et on annule l'opération.
                             // -- Si au moins une constante a changée, on insère le produit modifié.
-                            val originalProduct = productViewModel.productToEdit.value
                             if (originalProduct != null) {
                                 val originalForCompare =
-                                    originalProduct.copy(timestamp = editedProduct.timestamp)
+                                    originalProduct!!.copy(timestamp = editedProduct.timestamp)
                                 if (editedProduct == originalForCompare) {
                                     emitExitWithMessage("Aucune modification sur le produit.")
                                 } else {
