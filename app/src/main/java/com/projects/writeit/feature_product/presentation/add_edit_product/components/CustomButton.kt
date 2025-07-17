@@ -16,6 +16,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.projects.writeit.ui.theme.latoFamily
 
+/**
+ * Bouton personnalisé qui affiche "OK" et exécute une action quand on clique dessus.
+ *
+ * @param onSaveClick Fonction appelée quand on clique sur le bouton.
+ */
 @Composable
 fun CustomButton(
     onSaveClick: () -> Unit

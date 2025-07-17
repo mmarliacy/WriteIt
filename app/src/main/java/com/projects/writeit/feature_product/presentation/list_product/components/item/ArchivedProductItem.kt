@@ -1,7 +1,6 @@
 package com.projects.writeit.feature_product.presentation.list_product.components.item
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +23,16 @@ import com.projects.writeit.ui.theme.blackColor
 import com.projects.writeit.ui.theme.latoFamily
 import com.projects.writeit.ui.theme.surfaceLight
 
+/**
+ * Composable représentant l'item (le produit) archivé provenant de la liste active.
+ * Il s'agit d'un bloc où seul le nom du produit apparaît.
+ *
+ * Accompagné d'une icône "+" dans le cas où on souhaiterait singulièrement
+ * le ré-intégrer dans la liste active.
+ *
+ * @param product Il s'agit du produit archivé.
+ * @param onRestoreClick on renvoie le produit vers la liste active de produits dans l'onglet "Liste".
+ */
 @Composable
 fun ArchivedProductItem(
     product: Product,
@@ -49,6 +58,8 @@ fun ArchivedProductItem(
                 fontWeight = FontWeight.Normal,
                 modifier = Modifier.padding(start = 10.dp)
             )
+            // -> Icône "+" sur laquelle on clique par la fonction `clickable()`
+            // -> pour sa ré-intégration dans la liste active.
             Icon(
                 imageVector = Icons.Filled.AddCircle,
                 contentDescription = "",
