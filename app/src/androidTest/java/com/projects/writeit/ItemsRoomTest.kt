@@ -22,7 +22,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class ProductsRoomTest {
+class ItemsRoomTest {
 
     private lateinit var db: ItemDatabase
     private lateinit var dao: ItemDao

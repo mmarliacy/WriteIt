@@ -16,7 +16,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class MockProductsUnitTest {
+class MockItemsUnitTest {
 
     private lateinit var repository: ItemRepository
     private lateinit var fItemOrder : ItemOrder
