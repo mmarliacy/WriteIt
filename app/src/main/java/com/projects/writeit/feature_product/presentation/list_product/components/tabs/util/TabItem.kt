@@ -3,6 +3,8 @@ package com.projects.writeit.feature_product.presentation.list_product.component
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.FormatListNumbered
+import androidx.compose.material.icons.outlined.FormatListNumbered
+import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
@@ -18,6 +20,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
  * @param icon Icône affiché pour l'onglet correspondant.
  */
 enum class TabItem(val icon: ImageVector) {
-    ShopList(Icons.Filled.FormatListNumbered),
-    ArchivedList(Icons.Filled.Checklist)
+    WishList(Icons.Outlined.FormatListNumbered),
+    CaddyList(Icons.Outlined.ShoppingCart)
 }

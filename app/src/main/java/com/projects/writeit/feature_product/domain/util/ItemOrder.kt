@@ -8,8 +8,8 @@ package com.projects.writeit.feature_product.domain.util
  *
  * Permet à l'utilisateur de personnaliser l'affichage des produits dans l'UI.
  */
-sealed class ProductOrder(val orderType: OrderType){
-    class Name (orderType: OrderType): ProductOrder(orderType)
-    class Date (orderType: OrderType): ProductOrder(orderType)
-    class Category (orderType: OrderType): ProductOrder(orderType)
+sealed class ItemOrder(val orderType: OrderType){
+    class Name (orderType: OrderType): ItemOrder(orderType)
+    class Date (orderType: OrderType): ItemOrder(orderType)
+    class Category (orderType: OrderType): ItemOrder(orderType)
 }

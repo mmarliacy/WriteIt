@@ -29,7 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.projects.writeit.feature_product.presentation.add_edit_product.components.CustomButton
 import com.projects.writeit.feature_product.presentation.add_edit_product.components.CustomTitle
 import com.projects.writeit.feature_product.presentation.add_edit_product.components.TransparentTextField
-import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditProductEvent
+import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditItemEvent
 import com.projects.writeit.ui.theme.darkAccentColor
 import com.projects.writeit.ui.theme.latoFamily
 import kotlinx.coroutines.flow.collectLatest
@@ -136,10 +136,10 @@ fun AddEditDialog(
                 text = productNameState.nameText,
                 hint = productNameState.hint,
                 onValueChange = { productName ->
-                    viewModel.onEvent(AddEditProductEvent.EnteredName(productName))
+                    viewModel.onEvent(AddEditItemEvent.EnteredName(productName))
                 },
                 onFocusChange = { productName ->
-                    viewModel.onEvent(AddEditProductEvent.ChangeNameFocus(productName))
+                    viewModel.onEvent(AddEditItemEvent.ChangeNameFocus(productName))
                 },
                 isHintVisible = productNameState.isHintVisible,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -158,7 +158,7 @@ fun AddEditDialog(
                 hint = productQuantityState.hint,
                 onValueChange = { productQuantity ->
                     viewModel.onEvent(
-                        AddEditProductEvent.EnteredQuantity(
+                        AddEditItemEvent.EnteredQuantity(
                             productQuantity
                         )
                     )
@@ -166,7 +166,7 @@ fun AddEditDialog(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 onFocusChange = { productQuantity ->
                     viewModel.onEvent(
-                        AddEditProductEvent.ChangeQuantityFocus(
+                        AddEditItemEvent.ChangeQuantityFocus(
                             productQuantity
                         )
                     )
@@ -185,11 +185,11 @@ fun AddEditDialog(
                 text = productPriceState.priceText,
                 hint = productPriceState.hint,
                 onValueChange = { productPrice ->
-                    viewModel.onEvent(AddEditProductEvent.EnteredPrice(productPrice))
+                    viewModel.onEvent(AddEditItemEvent.EnteredPrice(productPrice))
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 onFocusChange = { productPrice ->
-                    viewModel.onEvent(AddEditProductEvent.ChangePriceFocus(productPrice))
+                    viewModel.onEvent(AddEditItemEvent.ChangePriceFocus(productPrice))
                 },
                 isHintVisible = productPriceState.isHintVisible,
                 isError = state.priceError != null,
@@ -206,7 +206,7 @@ fun AddEditDialog(
 
             // -> Bouton "OK" personnalisé pour enregistrer le produit dans la base de données locale.
             CustomButton {
-                viewModel.onEvent(AddEditProductEvent.SaveProduct)
+                viewModel.onEvent(AddEditItemEvent.SaveItem)
             }
         }
     }

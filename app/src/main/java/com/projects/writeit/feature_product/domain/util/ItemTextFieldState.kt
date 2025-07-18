@@ -6,7 +6,7 @@ package com.projects.writeit.feature_product.domain.util
  * Permet de stocker et de manipuler le contenu d'un champ de saisie,
  * ainsi que ses éventuelles erreurs de validation.
  */
-data class ProductTextFieldState (
+data class ItemTextFieldState (
     val hint: String = "",
     val nameText: String = "",
     val quantityText: String = "",

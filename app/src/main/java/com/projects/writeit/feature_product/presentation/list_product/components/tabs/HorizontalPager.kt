@@ -6,7 +6,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditViewModel
-import com.projects.writeit.feature_product.presentation.list_product.ProductsViewModel
+import com.projects.writeit.feature_product.presentation.list_product.MainViewModel
 import com.projects.writeit.feature_product.presentation.list_product.components.lists.ArchivedList
 import com.projects.writeit.feature_product.presentation.list_product.components.lists.ShopList
 
@@ -24,7 +24,7 @@ import com.projects.writeit.feature_product.presentation.list_product.components
  * @param pagerState État du pager, partagé avec l'UI pour garder en mémoire l’onglet actif.
  */
 @Composable
-fun CustomHorizontalPager(viewModel: ProductsViewModel,
+fun CustomHorizontalPager(viewModel: MainViewModel,
                           addEditViewModel: AddEditViewModel,
                           pagerState: PagerState
 ){

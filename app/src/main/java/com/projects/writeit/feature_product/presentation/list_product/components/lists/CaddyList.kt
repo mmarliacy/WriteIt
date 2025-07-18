@@ -12,8 +12,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.projects.writeit.feature_product.presentation.list_product.ProductsViewModel
-import com.projects.writeit.feature_product.presentation.list_product.components.item.ArchivedProductItem
+import com.projects.writeit.feature_product.presentation.list_product.MainViewModel
+import com.projects.writeit.feature_product.presentation.list_product.components.item.CaddyItem
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
 
 /**
@@ -26,7 +26,7 @@ import com.projects.writeit.feature_product.presentation.list_product.util.Produ
  * @param viewModel contient l'état de la liste et les actions utilisateur.
  */
 @Composable
-fun ArchivedList(viewModel: ProductsViewModel) {
+fun ArchivedList(viewModel: MainViewModel) {
 
     // -> Variable contenant l'état des produits archivés.
     val state = viewModel.state.value
@@ -38,7 +38,7 @@ fun ArchivedList(viewModel: ProductsViewModel) {
         // -> Méthode qui indexe chaque produit archivé et
         // -> qui permet d'interagir individuellement avec chaque item.
         itemsIndexed(
-            items = state.archivedProducts,
+            items = state.pArchivedItems,
             itemContent = { _, archivedProduct ->
                 // -> Le produit rétrécit verticalement en 1 seconde pour un retour à la liste
                 // -> des produits actifs et se développe verticalement quand il est rajouté à nouveau.
@@ -54,8 +54,8 @@ fun ArchivedList(viewModel: ProductsViewModel) {
                         // -> Réprésente le produit archivé sur lequel on agit.
                         // -> Lors du clic sur l'icône de restauration, l’événement `DisArchiveProduct`
                         // -> est déclenché pour le réintégrer dans la liste des produits actifs.
-                        ArchivedProductItem(
-                            product = archivedProduct,
+                        CaddyItem(
+                            pItem = archivedProduct,
                             onRestoreClick =
                             {
                                 viewModel.onEvent(ProductsEvent.DisArchiveProduct(archivedProduct))

@@ -4,12 +4,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.projects.writeit.feature_product.domain.model.Product
+import com.projects.writeit.feature_product.domain.model.Item
 import com.projects.writeit.feature_product.domain.use_case.ProductUseCases
-import com.projects.writeit.feature_product.domain.util.InvalidProductException
-import com.projects.writeit.feature_product.domain.util.ProductTextFieldState
-import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditProductEvent
-import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditProductState
+import com.projects.writeit.feature_product.domain.util.InvalidItemException
+import com.projects.writeit.feature_product.domain.util.ItemTextFieldState
+import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditItemEvent
+import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditItemState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -33,33 +33,33 @@ class AddEditViewModel @Inject constructor(
     private var currentProductId: Int? = null
 
     private val _state = mutableStateOf(
-        AddEditProductState()
+        AddEditItemState()
     )
-    val state: State<AddEditProductState> = _state
+    val state: State<AddEditItemState> = _state
 
     // -- Etat du nom du produit (modifiable + lecture seule).
     private val _productName = mutableStateOf(
-        ProductTextFieldState(
+        ItemTextFieldState(
             hint = "Nomme ton article..."
         )
     )
-    val productName: State<ProductTextFieldState> = _productName
+    val productName: State<ItemTextFieldState> = _productName
 
     // -- Etat de la quantité du produit (modifiable + lecture seule).
     private val _productQuantity = mutableStateOf(
-        ProductTextFieldState(
+        ItemTextFieldState(
             hint = "Combien... ?"
         )
     )
-    val productQuantity: State<ProductTextFieldState> = _productQuantity
+    val productQuantity: State<ItemTextFieldState> = _productQuantity
 
     // -- Etat de la prix du produit (modifiable + lecture seule).
     private val _productPrice = mutableStateOf(
-        ProductTextFieldState(
+        ItemTextFieldState(
             hint = "Combien ça coûte... ?"
         )
     )
-    val productPrice: State<ProductTextFieldState> = _productPrice
+    val productPrice: State<ItemTextFieldState> = _productPrice
 
 
     // -- MutableSharedFlow sert à émettre des événements ponctuels.
@@ -67,7 +67,7 @@ class AddEditViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private var originalProduct : Product? = null
+    private var fOriginalItem : Item? = null
 
 
     //---------------------------------------------------------------------------------------
@@ -96,8 +96,8 @@ class AddEditViewModel @Inject constructor(
 
     // -> On ajoute le produit édité suivi de l'animation.
     // -- Fermer le dialogue et émettre un message dans l'UI en préparant le formulaire à un nouvel ajout/update.
-    private suspend fun saveProductAndCloseDialog(message : String, product: Product) {
-        productUseCases.insertProduct(product)
+    private suspend fun saveProductAndCloseDialog(message : String, pItem: Item) {
+        productUseCases.pInsertItem(pItem)
         _eventFlow.emit(UiEvent.ExitTheDialog)
         _eventFlow.emit(UiEvent.ShowSnackBar(message))
         prepareForNewProduct()
@@ -109,9 +109,9 @@ class AddEditViewModel @Inject constructor(
         _eventFlow.emit(UiEvent.ShowSnackBar(message))
     }
 
-    fun initWithExistingProduct(product: Product) {
+    fun initWithExistingProduct(pItem: Item) {
         // stocke-le si nécessaire
-        originalProduct = product
+        fOriginalItem = pItem
     }
 
     //---------------------------------------------------------------------------------------
@@ -171,19 +171,19 @@ class AddEditViewModel @Inject constructor(
     //---------------------------------------------------------------------------------------
     // -- ADD / EDIT : UI EVENTS -->
     //------------------------------------
-    fun onEvent(event: AddEditProductEvent) {
+    fun onEvent(event: AddEditItemEvent) {
         when (event) {
 
             // -> On copie l’état actuel du champ (productName.value)
             // -> et on remplace uniquement le nameText par la nouvelle valeur entrée par l’utilisateur.
-            is AddEditProductEvent.EnteredName -> {
+            is AddEditItemEvent.EnteredName -> {
                 _productName.value = productName.value.copy(
                     nameText = event.value
                 )
             }
 
             // -> Le hint du nom du produit s'affiche si le champ de texte est vide et non visé.
-            is AddEditProductEvent.ChangeNameFocus -> {
+            is AddEditItemEvent.ChangeNameFocus -> {
                 _productName.value = productName.value.copy(
                     isHintVisible = !event.focusState.isFocused && productName.value.nameText.isBlank()
 
@@ -192,14 +192,14 @@ class AddEditViewModel @Inject constructor(
 
             // -> On copie l’état actuel du champ (productQuantity.value)
             // -> et on remplace uniquement le quantityText par la nouvelle valeur entrée par l’utilisateur.
-            is AddEditProductEvent.EnteredQuantity -> {
+            is AddEditItemEvent.EnteredQuantity -> {
                 _productQuantity.value = productQuantity.value.copy(
                     quantityText = event.value
                 )
             }
 
             // -> Le hint de la quantité du produit s'affiche si le champ de texte est vide et non visé.
-            is AddEditProductEvent.ChangeQuantityFocus -> {
+            is AddEditItemEvent.ChangeQuantityFocus -> {
                 _productQuantity.value = productQuantity.value.copy(
                     isHintVisible = !event.focusState.isFocused &&
                             productQuantity.value.quantityText.isBlank()
@@ -208,14 +208,14 @@ class AddEditViewModel @Inject constructor(
 
             // -> On copie l’état actuel du champ (productPrice.value)
             // -> et on remplace uniquement le priceText par la nouvelle valeur entrée par l’utilisateur.
-            is AddEditProductEvent.EnteredPrice -> {
+            is AddEditItemEvent.EnteredPrice -> {
                 _productPrice.value = productPrice.value.copy(
                     priceText = event.value
                 )
             }
 
             // -> Le hint du prix du produit s'affiche si le champ de texte est vide et non visé.
-            is AddEditProductEvent.ChangePriceFocus -> {
+            is AddEditItemEvent.ChangePriceFocus -> {
                 _productPrice.value = productPrice.value.copy(
                     isHintVisible = !event.focusState.isFocused &&
                             productPrice.value.priceText.isBlank()
@@ -223,32 +223,32 @@ class AddEditViewModel @Inject constructor(
             }
 
             // -> Reprendre et remplir le formulaire avec les données du produit à modifier.
-            is AddEditProductEvent.GetProductToEdit -> {
-                currentProductId = event.product.id
+            is AddEditItemEvent.GetProductToEdit -> {
+                currentProductId = event.pItem.id
                 _productName.value = productName.value.copy(
-                    nameText = event.product.name,
+                    nameText = event.pItem.name,
                     isHintVisible = false
                 )
                 _productQuantity.value = productQuantity.value.copy(
-                    quantityText = event.product.quantity.toString(),
+                    quantityText = event.pItem.quantity.toString(),
                     isHintVisible = false
                 )
                 _productPrice.value = productPrice.value.copy(
-                    priceText = event.product.price.toString(),
+                    priceText = event.pItem.price.toString(),
                     isHintVisible = false
                 )
             }
 
             // -> Crée un nouveau produit ou met à jour un ancien produit,
             // -> à partir des données renseignées dans le formulaire avec un "try/catch" pour gérer les exceptions.
-            is AddEditProductEvent.SaveProduct -> {
+            is AddEditItemEvent.SaveItem -> {
                 viewModelScope.launch {
                     try {
                         // Vérifier toutes les valeurs et les valider à travers les fonctions de checking.
                         val checkedName = checkName(productName.value.nameText)
                         val checkedPrice = checkPrice(productPrice.value.priceText)
                         val checkedQuantity = checkQuantity(productQuantity.value.quantityText)
-                        val editedProduct = Product(
+                        val editedItem = Item(
                             id = currentProductId,
                             name = checkedName,
                             timestamp = System.currentTimeMillis(),
@@ -260,28 +260,28 @@ class AddEditViewModel @Inject constructor(
                             // -- et prépare le formulaire pour un nouvel ajout.
                             saveProductAndCloseDialog(
                                 message = "${productName.value.nameText} a été ajouté à la liste",
-                                product = editedProduct)
+                                pItem = editedItem)
                         } else {
                             // -- Si l'id n'est pas nul (produit existant), on récupère le produit original stocké dans le ProductViewModel.
                             // -- Le timestamp (de création) étant différent on en copie la valeur pour comparé le produit original à celui qu'on a édité.
                             // -- Si les autres constantes n'ont pas changés, on revient à la liste et on annule l'opération.
                             // -- Si au moins une constante a changée, on insère le produit modifié.
-                            if (originalProduct != null) {
+                            if (fOriginalItem != null) {
                                 val originalForCompare =
-                                    originalProduct!!.copy(timestamp = editedProduct.timestamp)
-                                if (editedProduct == originalForCompare) {
+                                    fOriginalItem!!.copy(timestamp = editedItem.timestamp)
+                                if (editedItem == originalForCompare) {
                                     emitExitWithMessage("Aucune modification sur le produit.")
                                 } else {
                                     saveProductAndCloseDialog(
                                         message = "${productName.value.nameText} a été mis à jour",
-                                        product = editedProduct)
+                                        pItem = editedItem)
                                 }
                             } else {
                                 // Pas de produit original en édition
                                 emitExitWithMessage("Impossible de retrouver le produit d’origine")
                             }
                         }
-                    } catch (e: InvalidProductException) {
+                    } catch (e: InvalidItemException) {
                         _eventFlow.emit(
                             UiEvent.ShowSnackBar(
                                 message = e.message ?: "Produit non ajouté"

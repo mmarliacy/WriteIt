@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.outlined.ShoppingCartCheckout
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -16,10 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.projects.writeit.feature_product.domain.model.Product
-import com.projects.writeit.ui.theme.blackColor
+import com.projects.writeit.feature_product.domain.model.Item
+import com.projects.writeit.ui.theme.Black
 import com.projects.writeit.ui.theme.latoFamily
 import com.projects.writeit.ui.theme.surfaceLight
 
@@ -30,12 +32,12 @@ import com.projects.writeit.ui.theme.surfaceLight
  * Accompagné d'une icône "+" dans le cas où on souhaiterait singulièrement
  * le ré-intégrer dans la liste active.
  *
- * @param product Il s'agit du produit archivé.
+ * @param pItem Il s'agit du produit archivé.
  * @param onRestoreClick on renvoie le produit vers la liste active de produits dans l'onglet "Liste".
  */
 @Composable
-fun ArchivedProductItem(
-    product: Product,
+fun CaddyItem (
+    pItem: Item,
     onRestoreClick: () -> Unit
 ) {
     Surface(
@@ -51,8 +53,12 @@ fun ArchivedProductItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+                Icon(
+                    imageVector = Icons.Outlined.ShoppingCartCheckout,
+                    contentDescription = "Mettre dans le caddy"
+                )
             Text(
-                text = product.name,
+                text = pItem.name,
                 fontSize = 15.5.sp,
                 fontFamily = latoFamily,
                 fontWeight = FontWeight.Normal,
@@ -68,9 +74,28 @@ fun ArchivedProductItem(
                     .clickable {
                         onRestoreClick()
                     },
-                tint = blackColor
+                tint = Black
             )
         }
     }
 
+}
+
+@Preview
+@Composable
+fun ShowMeCaddyItem(){
+    val fakeItem = Item(
+        id = 1,
+        name = "Tablette de Chocolat",
+        quantity = 2,
+        price = 2.50,
+        category = "Petit-Déjeuner",
+        timestamp = 1234,
+        isInTheCaddy = true
+    )
+
+    CaddyItem(
+        pItem = fakeItem,
+        onRestoreClick = {}
+    )
 }

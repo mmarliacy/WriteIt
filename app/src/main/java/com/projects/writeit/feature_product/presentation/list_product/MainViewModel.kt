@@ -6,10 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.projects.writeit.feature_product.domain.model.Product
+import com.projects.writeit.feature_product.domain.model.Item
 import com.projects.writeit.feature_product.domain.use_case.ProductUseCases
 import com.projects.writeit.feature_product.domain.util.OrderType
-import com.projects.writeit.feature_product.domain.util.ProductOrder
+import com.projects.writeit.feature_product.domain.util.ItemOrder
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsState
 import com.projects.writeit.feature_product.presentation.list_product.util.SelectableProduct
@@ -40,7 +40,7 @@ import javax.inject.Inject
  * - L’émission d’événements UI (snackbars)
  */
 @HiltViewModel
-class ProductsViewModel @Inject constructor(
+class MainViewModel @Inject constructor(
     private val productUseCases: ProductUseCases
 ) : ViewModel() {
 
@@ -49,7 +49,7 @@ class ProductsViewModel @Inject constructor(
     val state: State<ProductsState> = _state
 
     // Produits récemment supprimé à ré-intégrer dans la liste par le biais du SnackBar.
-    private var itemsToDelete : List<Product>? = null
+    private var itemsToDelete : List<Item>? = null
 
 
     // Travail asynchrone qui permet de contrôler la récupération de la liste des produits (actifs/archivés).
@@ -61,13 +61,13 @@ class ProductsViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     // Produit dont l'id est null et qui sert de réceptacle pour le produit à éditer.
-    private val _productToEdit = mutableStateOf<Product?>(null)
-    val productToEdit: State<Product?> = _productToEdit
+    private val f_itemToEdit = mutableStateOf<Item?>(null)
+    val fItemToEdit: State<Item?> = f_itemToEdit
 
     // Au lancement du ViewModel, on récupère les produits actifs et archivés.
     init {
-        getActiveProducts(productOrder = ProductOrder.Date(OrderType.AscendingOrder))
-        getArchivedProducts(productOrder = ProductOrder.Date(OrderType.AscendingOrder))
+        getActiveProducts(pItemOrder = ItemOrder.Date(OrderType.AscendingOrder))
+        getArchivedProducts(pItemOrder = ItemOrder.Date(OrderType.AscendingOrder))
     }
 
     //---------------------------------------------------------------------------------------
@@ -80,9 +80,9 @@ class ProductsViewModel @Inject constructor(
         .map { liste ->
             Log.i(
                 "SUM",
-                "Calcul de somme: ${liste.sumOf { it.product.price * it.product.quantity }}"
+                "Calcul de somme: ${liste.sumOf { it.pItem.price * it.pItem.quantity }}"
             )
-            val total = liste.sumOf { it.product.price * it.product.quantity }
+            val total = liste.sumOf { it.pItem.price * it.pItem.quantity }
             val arrondi = BigDecimal(total).setScale(2, RoundingMode.HALF_UP).toDouble()
             Log.i("SUM", "Calcul de somme: $arrondi")
             arrondi
@@ -90,43 +90,43 @@ class ProductsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, 0.0)
 
     // On récupère les informations du produit à éditer.
-    fun productToEdit(product: Product) {
-        _productToEdit.value = product
+    fun productToEdit(pItem: Item) {
+        f_itemToEdit.value = pItem
     }
 
 
     // Récupère les produits actifs depuis la couche UseCases,
     // puis les transforme en liste de SelectableProduct pour l'UI.
-    private fun getActiveProducts(productOrder: ProductOrder) {
+    private fun getActiveProducts(pItemOrder: ItemOrder) {
         getActiveProductsJob?.cancel()
-        getActiveProductsJob = productUseCases.getProducts(productOrder).onEach {
+        getActiveProductsJob = productUseCases.pGetWishList(pItemOrder).onEach {
             val selectableList = it.map { product ->
-                SelectableProduct(product = product)
+                SelectableProduct(pItem = product)
             }
             _state.value = state.value.copy(
                 selectableActiveProducts = selectableList,
-                productsOrder = productOrder
+                productsOrder = pItemOrder
             )
         }.catch {
             _eventFlow.emit(UiEvent.ShowSnackBar("La liste n'a pas pu être récupérée, patientez un instant..."))
         }.launchIn(viewModelScope)
-        Log.i("DEBUG", "Produits: ${state.value.selectableActiveProducts.map { it.product.name }}")
+        Log.i("DEBUG", "Produits: ${state.value.selectableActiveProducts.map { it.pItem.name }}")
     }
 
     // Récupère les produits archivés.
-    private fun getArchivedProducts(productOrder: ProductOrder) {
+    private fun getArchivedProducts(pItemOrder: ItemOrder) {
         getArchivedProductsJob?.cancel()
-        getArchivedProductsJob = productUseCases.getArchivedProducts().onEach {
+        getArchivedProductsJob = productUseCases.pGetCaddyList().onEach {
             _state.value = state.value.copy(
-                archivedProducts = it,
-                productsOrder = productOrder
+                pArchivedItems = it,
+                productsOrder = pItemOrder
             )
         }.catch {
             _eventFlow.emit(UiEvent.ShowSnackBar("La liste n'a pas pu être récupérée, patientez un instant..."))
         }.launchIn(viewModelScope)
         Log.i(
             "ARCHIVE DEBUG",
-            "Produits archivés : ${state.value.selectableActiveProducts.map { it.product.name }}"
+            "Produits archivés : ${state.value.selectableActiveProducts.map { it.pItem.name }}"
         )
     }
 
@@ -145,12 +145,12 @@ class ProductsViewModel @Inject constructor(
         when (event) {
             // Appelle la liste de produits de manière ordonnée.
             is ProductsEvent.Order -> {
-                if (state.value.productsOrder::class == event.productOrder::class &&
-                    state.value.productsOrder.orderType == event.productOrder.orderType
+                if (state.value.productsOrder::class == event.pItemOrder::class &&
+                    state.value.productsOrder.orderType == event.pItemOrder.orderType
                 ) {
                     return
                 }
-                getActiveProducts(event.productOrder)
+                getActiveProducts(event.pItemOrder)
             }
 
             // Active/Désactive le dialogue d'édition de produit.
@@ -171,10 +171,10 @@ class ProductsViewModel @Inject constructor(
             // On insère le produit dans la liste des produits archivés.
             // Affiche un snackbar pour confirmer l'insertion / notifier l'échec de l'insertion.
             is ProductsEvent.ArchiveProduct -> {
-                val archivedProduct = event.product.copy(isArchived = true)
+                val archivedProduct = event.pItem.copy(isInTheCaddy = true)
                 viewModelScope.launch {
                     try {
-                        productUseCases.insertProduct(archivedProduct)
+                        productUseCases.pInsertItem(archivedProduct)
                         _eventFlow.emit(UiEvent.ShowSnackBar("${archivedProduct.name} a été archivé"))
                     } catch (e : Exception) {
                         _eventFlow.emit(UiEvent.ShowSnackBar("${archivedProduct.name} n'a pas été archivé"))
@@ -186,10 +186,10 @@ class ProductsViewModel @Inject constructor(
             // On le remet à nouveau dans la liste des produits actifs.
             // Affiche un snackbar pour confirmer l'insertion / notifier l'échec de l'insertion.
             is ProductsEvent.DisArchiveProduct -> {
-                val disArchiveProduct = event.product.copy(isArchived = false)
+                val disArchiveProduct = event.pItem.copy(isInTheCaddy = false)
                 viewModelScope.launch {
                     try {
-                        productUseCases.insertProduct(disArchiveProduct)
+                        productUseCases.pInsertItem(disArchiveProduct)
                         _eventFlow.emit(UiEvent.ShowSnackBar("${disArchiveProduct.name} est de nouveau dans ta liste"))
                     } catch (e : Exception) {
                         _eventFlow.emit(UiEvent.ShowSnackBar("${disArchiveProduct.name} n'a pas pu être réintégré"))
@@ -203,7 +203,7 @@ class ProductsViewModel @Inject constructor(
             is ProductsEvent.RestoreProduct -> {
                 viewModelScope.launch {
                     itemsToDelete?.forEach {
-                        productUseCases.insertProduct(it)
+                        productUseCases.pInsertItem(it)
                     }
                     itemsToDelete = null
                 }
@@ -214,13 +214,13 @@ class ProductsViewModel @Inject constructor(
             // Affiche un snackbar globale une fois l'opération terminée.
             is ProductsEvent.RestoreAllProducts -> {
                 viewModelScope.launch {
-                    productUseCases.getArchivedProducts()
+                    productUseCases.pGetCaddyList()
                         .first()
                         .onEach { oldProduct ->
                             val productToRestore = oldProduct.copy(
-                                isArchived = false
+                                isInTheCaddy = false
                             )
-                            productUseCases.insertProduct(productToRestore)
+                            productUseCases.pInsertItem(productToRestore)
                         }
                     _eventFlow.emit(UiEvent.ShowSnackBar("Tous les produits ont été restaurés"))
                 }
@@ -241,7 +241,7 @@ class ProductsViewModel @Inject constructor(
                 viewModelScope.launch {
                     val updatedList =
                         state.value.selectableActiveProducts.map { selectableProduct ->
-                            if (selectableProduct.product.id == event.productId) {
+                            if (selectableProduct.pItem.id == event.productId) {
                                 selectableProduct.copy(isChecked = !selectableProduct.isChecked)
                             } else selectableProduct
                         }
@@ -262,7 +262,7 @@ class ProductsViewModel @Inject constructor(
                     var undeletedProducts = 0
                     itemsToDelete = state.value.selectableActiveProducts
                         .filter { it.isChecked }.map {
-                            it.product
+                            it.pItem
                         }
                     // -> Si aucun item n'est sélectionné, on le notifie à l'utilisateur
                     if (itemsToDelete!!.isEmpty()) {
@@ -272,7 +272,7 @@ class ProductsViewModel @Inject constructor(
 
                         itemsToDelete!!.forEach {
                             try {
-                                productUseCases.deleteProduct(it)
+                                productUseCases.pDeleteItem(it)
                             } catch (e: Exception) {
                                 undeletedProducts++
                             }
@@ -294,7 +294,7 @@ class ProductsViewModel @Inject constructor(
                             // qu'on souhaite récupérer pour une nouvelle suppression
                             val failedProducts = state.value.selectableActiveProducts
                                 .filter {it.isChecked}
-                                .map {it.product}
+                                .map {it.pItem}
                             _state.value = state.value.copy(
                                 selectableActiveProducts = updatedList!!,
                                 isSelectionMode = failedProducts.isNotEmpty(),  // Reste en mode selection si erreurs

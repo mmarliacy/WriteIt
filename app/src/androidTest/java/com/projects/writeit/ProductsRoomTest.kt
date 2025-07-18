@@ -3,17 +3,17 @@ package com.projects.writeit
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.projects.writeit.feature_product.data.data_source.ProductDao
-import com.projects.writeit.feature_product.data.data_source.ProductDatabase
-import com.projects.writeit.feature_product.data.repository.ProductRepositoryImpl
-import com.projects.writeit.feature_product.domain.model.Product
-import com.projects.writeit.feature_product.domain.repository.ProductRepository
-import com.projects.writeit.feature_product.domain.use_case.single_use_case.DeleteProduct
-import com.projects.writeit.feature_product.domain.use_case.single_use_case.GetProduct
-import com.projects.writeit.feature_product.domain.use_case.single_use_case.GetProducts
-import com.projects.writeit.feature_product.domain.use_case.single_use_case.InsertProduct
+import com.projects.writeit.feature_product.data.data_source.ItemDao
+import com.projects.writeit.feature_product.data.data_source.ItemDatabase
+import com.projects.writeit.feature_product.data.repository.ItemRepositoryImpl
+import com.projects.writeit.feature_product.domain.model.Item
+import com.projects.writeit.feature_product.domain.repository.ItemRepository
+import com.projects.writeit.feature_product.domain.use_case.single_use_case.DeleteItem
+import com.projects.writeit.feature_product.domain.use_case.single_use_case.GetItem
+import com.projects.writeit.feature_product.domain.use_case.single_use_case.GetWishList
+import com.projects.writeit.feature_product.domain.use_case.single_use_case.InsertItem
 import com.projects.writeit.feature_product.domain.util.OrderType
-import com.projects.writeit.feature_product.domain.util.ProductOrder
+import com.projects.writeit.feature_product.domain.util.ItemOrder
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -24,36 +24,36 @@ import org.junit.Test
 
 class ProductsRoomTest {
 
-    private lateinit var db: ProductDatabase
-    private lateinit var dao: ProductDao
-    private lateinit var repository: ProductRepository
-    private lateinit var productOrder: ProductOrder
-    private lateinit var newProduct: Product
+    private lateinit var db: ItemDatabase
+    private lateinit var dao: ItemDao
+    private lateinit var repository: ItemRepository
+    private lateinit var fItemOrder: ItemOrder
+    private lateinit var fNewItem: Item
 
     // Cas d'utilisations appelés pour tester la consultation, l'ajout,
     // la suppression, la mise à jour d'un produit
-    private lateinit var getProducts: GetProducts
-    private lateinit var insertProduct: InsertProduct
-    private lateinit var deleteProduct: DeleteProduct
-    private lateinit var getProduct: GetProduct
+    private lateinit var fGetWishList: GetWishList
+    private lateinit var fInsertItem: InsertItem
+    private lateinit var fDeleteItem: DeleteItem
+    private lateinit var fGetItem: GetItem
 
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.databaseBuilder(
             context,
-            ProductDatabase::class.java,
+            ItemDatabase::class.java,
             "database"
         ).allowMainThreadQueries().build()
-        productOrder = ProductOrder.Date(OrderType.AscendingOrder)
-        dao = db.productDao
-        repository = ProductRepositoryImpl(dao)
+        fItemOrder = ItemOrder.Date(OrderType.AscendingOrder)
+        dao = db.itemDao
+        repository = ItemRepositoryImpl(dao)
 
         // Uses cases
-        getProducts = GetProducts(repository)
-        insertProduct = InsertProduct(repository)
-        deleteProduct = DeleteProduct(repository)
-        getProduct = GetProduct(repository)
+        fGetWishList = GetWishList(repository)
+        fInsertItem = InsertItem(repository)
+        fDeleteItem = DeleteItem(repository)
+        fGetItem = GetItem(repository)
 
 
     }
@@ -61,7 +61,7 @@ class ProductsRoomTest {
     @Test
     fun getProducts() {
         runTest {
-            val productList = getProducts(productOrder).first()
+            val productList = fGetWishList(fItemOrder).first()
             assertTrue(productList.isEmpty())
         }
     }
@@ -70,20 +70,20 @@ class ProductsRoomTest {
     fun insertNewProduct() {
         runTest {
 
-            newProduct = Product(
+            fNewItem = Item(
                 id = 0,
                 name = "Café",
                 quantity = 2,
                 price = 1.50,
                 category = "Petit déjeuner",
                 timestamp = 1234,
-                isArchived = false
+                isInTheCaddy = false
             )
 
             // Ajouter le produit dans la base de données de test.
-            insertProduct(newProduct)
+            fInsertItem(fNewItem)
             // Récupérer le premier élément émis par le Flow
-            val productList = getProducts(productOrder).first()
+            val productList = fGetWishList(fItemOrder).first()
 
                 assertTrue(productList.isNotEmpty())
             // Prouver que c'est le bon élément peu importe l'ordre
@@ -96,29 +96,29 @@ class ProductsRoomTest {
     fun deleteNewProduct(){
         runTest {
             // New Product
-            newProduct = Product(
+            fNewItem = Item(
                 id = 0,
                 name = "Café",
                 quantity = 2,
                 price = 1.50,
                 category = "Petit déjeuner",
                 timestamp = 1234,
-                isArchived = false
+                isInTheCaddy = false
             )
             // Ajouter le produit dans la base de données de test.
-            insertProduct(newProduct)
+            fInsertItem(fNewItem)
             // Récupérer la liste après ajout dans la base de donnée locale
-            val productList = getProducts(productOrder).first()
+            val productList = fGetWishList(fItemOrder).first()
 
             // Vérifier que l'élément a été ajouté puis le supprimer.
             assertEquals(1, productList.size)
-            deleteProduct(newProduct)
+            fDeleteItem(fNewItem)
 
             // Récupérer la liste suite à la suppression
             // puis vérifier si elle est vide.
-            val updateList = getProducts(productOrder).first()
+            val updateList = fGetWishList(fItemOrder).first()
             assertEquals(0, updateList.size)
-            assertFalse(updateList.contains(newProduct))
+            assertFalse(updateList.contains(fNewItem))
         }
     }
 }

@@ -3,8 +3,8 @@ package com.projects.writeit.feature_product.domain.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity (tableName = "product_table")
-data class Product (
+@Entity (tableName = "item_table")
+data class Item (
     @PrimaryKey
     val id :Int?,
     val name: String,
@@ -12,7 +12,7 @@ data class Product (
     val price : Double,
     val category: String? = null,
     val timestamp: Long,
-    val isArchived: Boolean = false
+    val isInTheCaddy: Boolean = false
 ){
     /**
      * Liste des catégories possible pour un produit.

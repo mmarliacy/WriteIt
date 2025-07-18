@@ -44,10 +44,10 @@ import com.projects.writeit.feature_product.presentation.list_product.components
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.util.TabItem
 import com.projects.writeit.feature_product.presentation.list_product.components.bottom_app_bar.SortDropDownMenu
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
-import com.projects.writeit.ui.theme.blackColor
+import com.projects.writeit.ui.theme.Black
+import com.projects.writeit.ui.theme.White
 import com.projects.writeit.ui.theme.darkAccentColor
 import com.projects.writeit.ui.theme.latoFamily
-import com.projects.writeit.ui.theme.whiteColor
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -82,7 +82,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductsScreen(
-    viewModel: ProductsViewModel = hiltViewModel(),
+    viewModel: MainViewModel = hiltViewModel(),
     editViewModel: AddEditViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -99,7 +99,7 @@ fun ProductsScreen(
     // -> Etat du conteneur de l'écran.
     val scaffoldState = rememberScaffoldState()
 
-    val productToEdit = viewModel.productToEdit.value
+    val productToEdit = viewModel.fItemToEdit.value
 
 
     //---------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ fun ProductsScreen(
         }
         launch {
             viewModel.eventFlow.collectLatest { event ->
-                if (event is ProductsViewModel.UiEvent.ShowSnackBar) {
+                if (event is MainViewModel.UiEvent.ShowSnackBar) {
                     Log.d("SNACKBAR_EVENT", "Message reçu : ${event.message}")
                      val result = scaffoldState.snackbarHostState.showSnackbar(
                         message = event.message,
@@ -155,18 +155,18 @@ fun ProductsScreen(
                 title = {
                     Text(
                         text = "Ma liste de courses",
-                        color = whiteColor,
+                        color = White,
                         fontFamily = latoFamily,
                         fontWeight = FontWeight.Black,
                         fontSize = 16.sp
                     )
                 },
                 colors = TopAppBarColors(
-                    containerColor = blackColor,
-                    scrolledContainerColor = blackColor,
-                    navigationIconContentColor = whiteColor,
-                    titleContentColor = whiteColor,
-                    actionIconContentColor = whiteColor
+                    containerColor = Black,
+                    scrolledContainerColor = Black,
+                    navigationIconContentColor = White,
+                    titleContentColor = White,
+                    actionIconContentColor = White
 
                 ),
                 // Actions situées à droite du titre :
@@ -287,7 +287,7 @@ fun ProductsScreen(
                     top = it.calculateTopPadding(),
                     bottom = it.calculateBottomPadding()
                 )
-                .background(whiteColor)
+                .background(White)
         ) {
             CustomTabRow(pagerState = pagerState)
 

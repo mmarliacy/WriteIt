@@ -1,6 +1,6 @@
 package com.projects.writeit.feature_product.presentation.list_product.util
 
-import com.projects.writeit.feature_product.domain.model.Product
+import com.projects.writeit.feature_product.domain.model.Item
 
 /**
  * Classe représentant un produit avec un état de sélection.
@@ -8,6 +8,6 @@ import com.projects.writeit.feature_product.domain.model.Product
  * Utilisée pour permettre la sélection individuelle ou multiple de produits pour supprimer.
  */
 data class SelectableProduct(
-    val product: Product,
+    val pItem: Item,
     val isChecked: Boolean = false
 )

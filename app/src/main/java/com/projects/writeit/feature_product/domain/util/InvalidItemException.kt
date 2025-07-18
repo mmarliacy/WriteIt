@@ -6,6 +6,6 @@ package com.projects.writeit.feature_product.domain.util
  *
  * @param message Le message décrivant l'erreur de validation.
  */
-class InvalidProductException(
+class InvalidItemException(
     message: String
 ) : Exception(message)

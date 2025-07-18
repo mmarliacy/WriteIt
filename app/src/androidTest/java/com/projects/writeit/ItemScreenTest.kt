@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
-class ProductScreenTest {
+class ItemScreenTest {
 
 
     @get:Rule

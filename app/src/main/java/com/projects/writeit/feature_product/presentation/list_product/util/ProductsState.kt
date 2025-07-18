@@ -1,8 +1,8 @@
 package com.projects.writeit.feature_product.presentation.list_product.util
 
-import com.projects.writeit.feature_product.domain.model.Product
+import com.projects.writeit.feature_product.domain.model.Item
 import com.projects.writeit.feature_product.domain.util.OrderType
-import com.projects.writeit.feature_product.domain.util.ProductOrder
+import com.projects.writeit.feature_product.domain.util.ItemOrder
 
 /**
  * Classe représentant l'état de l'écran de gestion des produits.
@@ -13,8 +13,8 @@ import com.projects.writeit.feature_product.domain.util.ProductOrder
  */
 data class ProductsState(
     val selectableActiveProducts: List<SelectableProduct> = emptyList(),
-    val archivedProducts: List<Product> = emptyList(),
-    val productsOrder: ProductOrder = ProductOrder.Date(OrderType.AscendingOrder),
+    val pArchivedItems: List<Item> = emptyList(),
+    val productsOrder: ItemOrder = ItemOrder.Date(OrderType.AscendingOrder),
     val isDeletedProductIsVisible: Boolean = true,
     val showBottomSheet : Boolean = false,
     val isSelectionMode: Boolean = false,

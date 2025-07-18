@@ -15,9 +15,9 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditViewModel
-import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditProductEvent
-import com.projects.writeit.feature_product.presentation.list_product.ProductsViewModel
-import com.projects.writeit.feature_product.presentation.list_product.components.item.ProductItem
+import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditItemEvent
+import com.projects.writeit.feature_product.presentation.list_product.MainViewModel
+import com.projects.writeit.feature_product.presentation.list_product.components.item.WishItem
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
 
 /**
@@ -33,7 +33,7 @@ import com.projects.writeit.feature_product.presentation.list_product.util.Produ
  */
 @Composable
 fun ShopList(
-    viewModel: ProductsViewModel,
+    viewModel: MainViewModel,
     editViewModel: AddEditViewModel
 ) {
     // -> Variable contenant l'état des produits actifs.
@@ -71,21 +71,21 @@ fun ShopList(
                 // -> `OnCheckedChange → déclenche ou annule la sélection de l'item pour suppression multiple.
                 // -> `OnChecked` → Indique si l'item est actuellement sélectionné.
                 //------------------------------------
-                ProductItem(
-                    product = selectableProduct.product,
+                WishItem(
+                    item = selectableProduct.pItem,
                     isDeletionModeActive = state.isSelectionMode,
-                    onClickItem = {
-                        viewModel.onEvent(ProductsEvent.ArchiveProduct(product = selectableProduct.product))
+                    putInCaddyClick = {
+                        viewModel.onEvent(ProductsEvent.ArchiveProduct(pItem = selectableProduct.pItem))
                     },
-                    onLongClickItem = {
+                    onClickItem = {
                         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                         viewModel.onEvent(ProductsEvent.ToggleBottomDialog)
-                        selectableProduct.product.id?.let {
-                            if (it != viewModel.productToEdit.value?.id) {
-                                viewModel.productToEdit(product = selectableProduct.product)
+                        selectableProduct.pItem.id?.let {
+                            if (it != viewModel.fItemToEdit.value?.id) {
+                                viewModel.productToEdit(pItem = selectableProduct.pItem)
                                 editViewModel.onEvent(
-                                    AddEditProductEvent.GetProductToEdit(
-                                        product = selectableProduct.product
+                                    AddEditItemEvent.GetProductToEdit(
+                                        pItem = selectableProduct.pItem
                                     )
                                 )
                             }
@@ -95,7 +95,7 @@ fun ShopList(
                     onCheckedChange = { isChecked ->
                         viewModel.onEvent(
                             ProductsEvent.ToggleProductSelection(
-                                productId = selectableProduct.product.id!!,
+                                productId = selectableProduct.pItem.id!!,
                                 isChecked = isChecked
                             )
                         )
