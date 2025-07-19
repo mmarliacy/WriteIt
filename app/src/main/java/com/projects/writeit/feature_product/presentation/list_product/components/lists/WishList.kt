@@ -72,35 +72,35 @@ fun ShopList(
                 // -> `OnChecked` → Indique si l'item est actuellement sélectionné.
                 //------------------------------------
                 WishItem(
-                    item = selectableProduct.pItem,
+                    item = selectableProduct.item,
                     isDeletionModeActive = state.isSelectionMode,
                     putInCaddyClick = {
-                        viewModel.onEvent(ProductsEvent.ArchiveProduct(pItem = selectableProduct.pItem))
+                        viewModel.onEvent(ProductsEvent.PutInTheCaddy(pItem = selectableProduct.item))
                     },
                     onClickItem = {
                         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                         viewModel.onEvent(ProductsEvent.ToggleBottomDialog)
-                        selectableProduct.pItem.id?.let {
-                            if (it != viewModel.fItemToEdit.value?.id) {
-                                viewModel.productToEdit(pItem = selectableProduct.pItem)
+                        selectableProduct.item.id?.let {
+                            if (it != viewModel.itemToEdit.value?.id) {
+                                viewModel.productToEdit(pItem = selectableProduct.item)
                                 editViewModel.onEvent(
                                     AddEditItemEvent.GetProductToEdit(
-                                        pItem = selectableProduct.pItem
+                                        pItem = selectableProduct.item
                                     )
                                 )
                             }
                         }
                     },
-
-                    onCheckedChange = { isChecked ->
+                    onDeleteCheckedChange = { isChecked ->
                         viewModel.onEvent(
                             ProductsEvent.ToggleProductSelection(
-                                productId = selectableProduct.pItem.id!!,
+                                productId = selectableProduct.item.id!!,
                                 isChecked = isChecked
                             )
                         )
                     },
-                    checked = selectableProduct.isChecked
+                    deleteChecked = selectableProduct.isDeleteChecked,
+                    inCaddyChecked = selectableProduct.item.isInTheCaddy
                 )
             }
         }

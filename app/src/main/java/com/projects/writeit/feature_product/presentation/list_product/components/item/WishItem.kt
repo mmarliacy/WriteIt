@@ -9,12 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ShoppingCartCheckout
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,9 +25,9 @@ import androidx.compose.ui.unit.sp
 import com.projects.writeit.feature_product.domain.model.Item
 import com.projects.writeit.ui.theme.BlueNeutral
 import com.projects.writeit.ui.theme.BluePrimary
-import com.projects.writeit.ui.theme.SoftPink
+import com.projects.writeit.ui.theme.ErrorRed
+import com.projects.writeit.ui.theme.Green
 import com.projects.writeit.ui.theme.White
-import com.projects.writeit.ui.theme.darkAccentColor
 import com.projects.writeit.ui.theme.latoFamily
 import com.projects.writeit.ui.theme.surfaceLight
 import java.math.BigDecimal
@@ -52,19 +48,20 @@ import java.math.RoundingMode
  *
  * @param item Le produit à afficher.
  * @param isDeletionModeActive Active ou non l'affichage de la case à cocher.
- * @param checked Indique si le produit est actuellement coché pour suppression.
+ * @param deleteChecked Indique si le produit est actuellement coché pour suppression.
  * @param putInCaddyClick Action exécutée lors d'un clic simple sur l'icône "mettre dans le caddy".
  * @param onClickItem Action exécutée lors d'un appui sur l'item.
- * @param onCheckedChange Action déclenchée lorsqu’on coche ou décoche l’item.
+ * @param onDeleteCheckedChange Action déclenchée lorsqu’on coche ou décoche l’item.
  */
 @Composable
 fun WishItem(
     item : Item,
     isDeletionModeActive: Boolean,
-    checked: Boolean,
-    putInCaddyClick: () -> Unit, // Vérifier que la méthode correspond toujours a celle qui envoie l'article dans l'autre liste.
-    onClickItem: () -> Unit, // On met l'item à jour -> Logique à modifier
-    onCheckedChange: (Boolean) -> Unit
+    deleteChecked: Boolean,
+    inCaddyChecked: Boolean,
+    onClickItem: () -> Unit,
+    putInCaddyClick: (Boolean) -> Unit, // Vérifier que la méthode correspond toujours a celle qui envoie l'article dans l'autre liste.
+    onDeleteCheckedChange: (Boolean) -> Unit
 ) {
 
     // -> Calcule le prix total du produit (quantité × prix unitaire).
@@ -89,7 +86,7 @@ fun WishItem(
             modifier = Modifier.fillMaxWidth().padding(5.dp)
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .padding(start = 5.dp, end = 10.dp)
@@ -98,24 +95,32 @@ fun WishItem(
                 // -> Quand le mode "Suppression" est actif une case à cocher apparaît à gauche de l'item.
                 if (isDeletionModeActive) {
                         Checkbox(
-                            checked = checked,
+                            checked = deleteChecked,
                             onCheckedChange = {
-                                onCheckedChange(it)
+                                onDeleteCheckedChange(it)
                             },
                             colors = CheckboxDefaults.colors(
                                 checkmarkColor = White,
-                                checkedColor = darkAccentColor
+                                checkedColor = ErrorRed,
+                                uncheckedColor = ErrorRed
                             ),
                             // Utiliser pour supprimer le padding autour du checkbox
                             modifier = Modifier.size(20.dp)
                         )
                 } else {
                     // -> Bouton qui sert à mettre l'article dans le caddy => TODO()
-                    Icon(
-                        imageVector = Icons.Outlined.ShoppingCartCheckout,
-                        tint = SoftPink,
-                        contentDescription = "Mettre dans le caddy",
-                        modifier = Modifier.clickable { putInCaddyClick() }.size(25.dp)
+                    Checkbox(
+                        checked = inCaddyChecked,
+                        onCheckedChange = {
+                            putInCaddyClick(it)
+                        },
+                        colors = CheckboxDefaults.colors(
+                            checkmarkColor = White,
+                            checkedColor = Green,
+                            uncheckedColor = BlueNeutral
+                        ),
+                        // Utiliser pour supprimer le padding autour du checkbox
+                        modifier = Modifier.size(20.dp)
                     )
                 }
                 // -> Quantité du produit.
@@ -186,10 +191,11 @@ fun ShowMeWishItem(){
     WishItem(
         item = fakeItem,
         isDeletionModeActive = false,
-        checked = false,
+        deleteChecked = false,
         putInCaddyClick = { },
         onClickItem = { },
-        onCheckedChange = { }
+        onDeleteCheckedChange = { },
+        inCaddyChecked = true,
     ) 
 }
 

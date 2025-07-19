@@ -8,13 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.projects.writeit.feature_product.domain.model.Item
 import com.projects.writeit.feature_product.domain.use_case.ProductUseCases
-import com.projects.writeit.feature_product.domain.util.OrderType
 import com.projects.writeit.feature_product.domain.util.ItemOrder
+import com.projects.writeit.feature_product.domain.util.OrderType
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsState
 import com.projects.writeit.feature_product.presentation.list_product.util.SelectableProduct
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -49,7 +50,7 @@ class MainViewModel @Inject constructor(
     val state: State<ProductsState> = _state
 
     // Produits récemment supprimé à ré-intégrer dans la liste par le biais du SnackBar.
-    private var itemsToDelete : List<Item>? = null
+    private var itemsToDelete: List<Item>? = null
 
 
     // Travail asynchrone qui permet de contrôler la récupération de la liste des produits (actifs/archivés).
@@ -61,8 +62,8 @@ class MainViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     // Produit dont l'id est null et qui sert de réceptacle pour le produit à éditer.
-    private val f_itemToEdit = mutableStateOf<Item?>(null)
-    val fItemToEdit: State<Item?> = f_itemToEdit
+    private val _itemToEdit = mutableStateOf<Item?>(null)
+    val itemToEdit: State<Item?> = _itemToEdit
 
     // Au lancement du ViewModel, on récupère les produits actifs et archivés.
     init {
@@ -80,9 +81,9 @@ class MainViewModel @Inject constructor(
         .map { liste ->
             Log.i(
                 "SUM",
-                "Calcul de somme: ${liste.sumOf { it.pItem.price * it.pItem.quantity }}"
+                "Calcul de somme: ${liste.sumOf { it.item.price * it.item.quantity }}"
             )
-            val total = liste.sumOf { it.pItem.price * it.pItem.quantity }
+            val total = liste.sumOf { it.item.price * it.item.quantity }
             val arrondi = BigDecimal(total).setScale(2, RoundingMode.HALF_UP).toDouble()
             Log.i("SUM", "Calcul de somme: $arrondi")
             arrondi
@@ -91,7 +92,7 @@ class MainViewModel @Inject constructor(
 
     // On récupère les informations du produit à éditer.
     fun productToEdit(pItem: Item) {
-        f_itemToEdit.value = pItem
+        _itemToEdit.value = pItem
     }
 
 
@@ -101,7 +102,7 @@ class MainViewModel @Inject constructor(
         getActiveProductsJob?.cancel()
         getActiveProductsJob = productUseCases.pGetWishList(pItemOrder).onEach {
             val selectableList = it.map { product ->
-                SelectableProduct(pItem = product)
+                SelectableProduct(item = product)
             }
             _state.value = state.value.copy(
                 selectableActiveProducts = selectableList,
@@ -110,7 +111,7 @@ class MainViewModel @Inject constructor(
         }.catch {
             _eventFlow.emit(UiEvent.ShowSnackBar("La liste n'a pas pu être récupérée, patientez un instant..."))
         }.launchIn(viewModelScope)
-        Log.i("DEBUG", "Produits: ${state.value.selectableActiveProducts.map { it.pItem.name }}")
+        Log.i("DEBUG", "Produits: ${state.value.selectableActiveProducts.map { it.item.name }}")
     }
 
     // Récupère les produits archivés.
@@ -126,7 +127,7 @@ class MainViewModel @Inject constructor(
         }.launchIn(viewModelScope)
         Log.i(
             "ARCHIVE DEBUG",
-            "Produits archivés : ${state.value.selectableActiveProducts.map { it.pItem.name }}"
+            "Produits archivés : ${state.value.selectableActiveProducts.map { it.item.name }}"
         )
     }
 
@@ -170,14 +171,35 @@ class MainViewModel @Inject constructor(
             // Archive le produit en lui attribuant la propriété "isArchived"
             // On insère le produit dans la liste des produits archivés.
             // Affiche un snackbar pour confirmer l'insertion / notifier l'échec de l'insertion.
-            is ProductsEvent.ArchiveProduct -> {
-                val archivedProduct = event.pItem.copy(isInTheCaddy = true)
+            is ProductsEvent.PutInTheCaddy -> {
                 viewModelScope.launch {
                     try {
-                        productUseCases.pInsertItem(archivedProduct)
-                        _eventFlow.emit(UiEvent.ShowSnackBar("${archivedProduct.name} a été archivé"))
-                    } catch (e : Exception) {
-                        _eventFlow.emit(UiEvent.ShowSnackBar("${archivedProduct.name} n'a pas été archivé"))
+                        // 1. Mettre à jour l'état (UI)
+                        _state.value = state.value.copy(
+                            selectableActiveProducts = state.value.selectableActiveProducts.map { selectableItem ->
+                                if (selectableItem.item.id == event.pItem.id) {
+                                    selectableItem.copy(
+                                        item = selectableItem.item.copy(isInTheCaddy = true)
+                                    )
+                                } else {
+                                    selectableItem
+                                }
+                            }
+                        )
+
+                        delay(500)
+
+                        // 2. Récupérer l'objet modifié dans le nouveau state
+                        val updatedItem = _state.value.selectableActiveProducts
+                            .first { it.item.id == event.pItem.id }
+                            .item
+
+                        // 3. L'insérer
+                        productUseCases.pInsertItem(updatedItem)
+
+                        _eventFlow.emit(UiEvent.ShowSnackBar("${updatedItem.name} a été archivé"))
+                    } catch (e: Exception) {
+                        _eventFlow.emit(UiEvent.ShowSnackBar("${event.pItem.name} n'a pas été archivé"))
                     }
                 }
             }
@@ -191,7 +213,7 @@ class MainViewModel @Inject constructor(
                     try {
                         productUseCases.pInsertItem(disArchiveProduct)
                         _eventFlow.emit(UiEvent.ShowSnackBar("${disArchiveProduct.name} est de nouveau dans ta liste"))
-                    } catch (e : Exception) {
+                    } catch (e: Exception) {
                         _eventFlow.emit(UiEvent.ShowSnackBar("${disArchiveProduct.name} n'a pas pu être réintégré"))
                     }
                 }
@@ -241,13 +263,13 @@ class MainViewModel @Inject constructor(
                 viewModelScope.launch {
                     val updatedList =
                         state.value.selectableActiveProducts.map { selectableProduct ->
-                            if (selectableProduct.pItem.id == event.productId) {
-                                selectableProduct.copy(isChecked = !selectableProduct.isChecked)
+                            if (selectableProduct.item.id == event.productId) {
+                                selectableProduct.copy(isDeleteChecked = !selectableProduct.isDeleteChecked)
                             } else selectableProduct
                         }
                     _state.value = state.value.copy(selectableActiveProducts = updatedList)
 
-                    if (state.value.selectableActiveProducts.any { it.isChecked }) {
+                    if (state.value.selectableActiveProducts.any { it.isDeleteChecked }) {
                         _state.value = state.value.copy(buttonDeleteIsVisible = true)
                     } else {
                         _state.value = state.value.copy(buttonDeleteIsVisible = false)
@@ -261,14 +283,14 @@ class MainViewModel @Inject constructor(
                 viewModelScope.launch {
                     var undeletedProducts = 0
                     itemsToDelete = state.value.selectableActiveProducts
-                        .filter { it.isChecked }.map {
-                            it.pItem
+                        .filter { it.isDeleteChecked }.map {
+                            it.item
                         }
                     // -> Si aucun item n'est sélectionné, on le notifie à l'utilisateur
                     if (itemsToDelete!!.isEmpty()) {
                         _eventFlow.emit(UiEvent.ShowSnackBar("Sélectionnez au moins un produit à supprimer"))
                     } else {
-                        var updatedList : List<SelectableProduct>? = emptyList()
+                        var updatedList: List<SelectableProduct>? = emptyList()
 
                         itemsToDelete!!.forEach {
                             try {
@@ -279,10 +301,10 @@ class MainViewModel @Inject constructor(
                         }
                         // Si tous les produits ont été supprimés on désactive le mode suppression
                         // et on le notifie à l'utilisateur.
-                        if(undeletedProducts == 0){
+                        if (undeletedProducts == 0) {
                             updatedList = state.value.selectableActiveProducts
-                                .filter {!it.isChecked }
-                                .map { it.copy(isChecked = false)}
+                                .filter { !it.isDeleteChecked }
+                                .map { it.copy(isDeleteChecked = false) }
                             _state.value = state.value.copy(
                                 selectableActiveProducts = updatedList,
                                 isSelectionMode = false,
@@ -293,8 +315,8 @@ class MainViewModel @Inject constructor(
                             // Liste des produits dont la suppression à échouer
                             // qu'on souhaite récupérer pour une nouvelle suppression
                             val failedProducts = state.value.selectableActiveProducts
-                                .filter {it.isChecked}
-                                .map {it.pItem}
+                                .filter { it.isDeleteChecked }
+                                .map { it.item }
                             _state.value = state.value.copy(
                                 selectableActiveProducts = updatedList!!,
                                 isSelectionMode = failedProducts.isNotEmpty(),  // Reste en mode selection si erreurs

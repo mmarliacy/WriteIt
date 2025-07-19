@@ -11,17 +11,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.outlined.ShoppingCartCheckout
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.projects.writeit.feature_product.domain.model.Item
 import com.projects.writeit.ui.theme.Black
+import com.projects.writeit.ui.theme.BluePrimary
 import com.projects.writeit.ui.theme.latoFamily
 import com.projects.writeit.ui.theme.surfaceLight
 
@@ -53,10 +56,18 @@ fun CaddyItem (
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-                Icon(
-                    imageVector = Icons.Outlined.ShoppingCartCheckout,
-                    contentDescription = "Mettre dans le caddy"
-                )
+               IconButton(
+                   onClick = {}
+               ) {
+                   Icon(
+                       imageVector = Icons.Outlined.ShoppingCartCheckout,
+                       contentDescription = "Mettre dans le caddy",
+                       tint = BluePrimary,
+                       modifier = Modifier.graphicsLayer {
+                           scaleX = -1f // effet miroir vertical
+                       }
+                   )
+               }
             Text(
                 text = pItem.name,
                 fontSize = 15.5.sp,

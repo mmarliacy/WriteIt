@@ -1,8 +1,8 @@
 package com.projects.writeit.feature_product.presentation.list_product.util
 
 import com.projects.writeit.feature_product.domain.model.Item
-import com.projects.writeit.feature_product.domain.util.OrderType
 import com.projects.writeit.feature_product.domain.util.ItemOrder
+import com.projects.writeit.feature_product.domain.util.OrderType
 
 /**
  * Classe représentant l'état de l'écran de gestion des produits.

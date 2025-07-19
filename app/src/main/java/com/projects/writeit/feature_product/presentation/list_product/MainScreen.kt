@@ -6,7 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.FabPosition
+import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -16,12 +19,9 @@ import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -36,15 +36,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditViewModel
 import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditDialog
+import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditViewModel
+import com.projects.writeit.feature_product.presentation.list_product.components.bottom_app_bar.SortDropDownMenu
 import com.projects.writeit.feature_product.presentation.list_product.components.lists.ShopList
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.CustomHorizontalPager
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.CustomTabRow
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.util.TabItem
-import com.projects.writeit.feature_product.presentation.list_product.components.bottom_app_bar.SortDropDownMenu
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
 import com.projects.writeit.ui.theme.Black
+import com.projects.writeit.ui.theme.BluePrimary
 import com.projects.writeit.ui.theme.White
 import com.projects.writeit.ui.theme.darkAccentColor
 import com.projects.writeit.ui.theme.latoFamily
@@ -99,7 +100,7 @@ fun ProductsScreen(
     // -> Etat du conteneur de l'écran.
     val scaffoldState = rememberScaffoldState()
 
-    val productToEdit = viewModel.fItemToEdit.value
+    val productToEdit = viewModel.itemToEdit.value
 
 
     //---------------------------------------------------------------------------------------
@@ -112,7 +113,6 @@ fun ProductsScreen(
         launch {
             editViewModel.eventFlow.collectLatest { event ->
                 if (event is AddEditViewModel.UiEvent.ShowSnackBar) {
-
                     scaffoldState.snackbarHostState.showSnackbar(event.message)
                 }
             }
@@ -162,7 +162,7 @@ fun ProductsScreen(
                     )
                 },
                 colors = TopAppBarColors(
-                    containerColor = Black,
+                    containerColor = BluePrimary,
                     scrolledContainerColor = Black,
                     navigationIconContentColor = White,
                     titleContentColor = White,

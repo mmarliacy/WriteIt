@@ -11,6 +11,7 @@ val Black = Color(0xFF0E0E0E)          // Couleur du texte
 // Couleurs facultatives pour le dark mode ou les statuts
 val DarkGray = Color(0xFF121212)
 val ErrorRed = Color(0xFFB00020)
+val Green = Color(0xFF05C46B)
 
 
 //--> OLD COLORS

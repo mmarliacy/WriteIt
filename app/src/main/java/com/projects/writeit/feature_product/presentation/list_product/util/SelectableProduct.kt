@@ -8,6 +8,6 @@ import com.projects.writeit.feature_product.domain.model.Item
  * Utilisée pour permettre la sélection individuelle ou multiple de produits pour supprimer.
  */
 data class SelectableProduct(
-    val pItem: Item,
-    val isChecked: Boolean = false
+    val item: Item,
+    val isDeleteChecked: Boolean = false,
 )

@@ -13,7 +13,7 @@ import com.projects.writeit.feature_product.domain.util.ItemOrder
  */
 sealed class ProductsEvent {
     data class Order(val pItemOrder: ItemOrder) : ProductsEvent()
-    data class ArchiveProduct(val pItem: Item): ProductsEvent()
+    data class PutInTheCaddy(val pItem: Item): ProductsEvent()
     data class DisArchiveProduct(val pItem: Item): ProductsEvent()
     data class ToggleProductSelection(val productId: Int, val isChecked: Boolean): ProductsEvent()
     data class DeleteSelectedProducts(val productsToDelete: List<SelectableProduct>): ProductsEvent()
