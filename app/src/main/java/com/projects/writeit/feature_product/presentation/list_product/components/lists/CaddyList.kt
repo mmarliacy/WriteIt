@@ -7,6 +7,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
@@ -32,7 +33,7 @@ fun ArchivedList(viewModel: MainViewModel) {
     val state = viewModel.state.value
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(top = 10.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         // -> Méthode qui indexe chaque produit archivé et
@@ -55,7 +56,7 @@ fun ArchivedList(viewModel: MainViewModel) {
                         // -> Lors du clic sur l'icône de restauration, l’événement `DisArchiveProduct`
                         // -> est déclenché pour le réintégrer dans la liste des produits actifs.
                         CaddyItem(
-                            pItem = archivedProduct,
+                            item = archivedProduct,
                             onRestoreClick =
                             {
                                 viewModel.onEvent(ProductsEvent.DisArchiveProduct(archivedProduct))

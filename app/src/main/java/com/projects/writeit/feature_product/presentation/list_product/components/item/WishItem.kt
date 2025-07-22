@@ -23,10 +23,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.projects.writeit.feature_product.domain.model.Item
+import com.projects.writeit.feature_product.presentation.list_product.components.lists.util.CustomDeleteCheckBox
 import com.projects.writeit.ui.theme.BlueNeutral
 import com.projects.writeit.ui.theme.BluePrimary
-import com.projects.writeit.ui.theme.ErrorRed
 import com.projects.writeit.ui.theme.Green
+import com.projects.writeit.ui.theme.SoftBlue
 import com.projects.writeit.ui.theme.White
 import com.projects.writeit.ui.theme.latoFamily
 import com.projects.writeit.ui.theme.surfaceLight
@@ -74,7 +75,7 @@ fun WishItem(
         color = surfaceLight,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 10.dp, end = 2.dp)
+            .padding(start = 5.dp, end = 5.dp)
             .clickable (
                 onClick = {onClickItem()}
             ),
@@ -94,21 +95,15 @@ fun WishItem(
             ) {
                 // -> Quand le mode "Suppression" est actif une case à cocher apparaît à gauche de l'item.
                 if (isDeletionModeActive) {
-                        Checkbox(
-                            checked = deleteChecked,
-                            onCheckedChange = {
-                                onDeleteCheckedChange(it)
-                            },
-                            colors = CheckboxDefaults.colors(
-                                checkmarkColor = White,
-                                checkedColor = ErrorRed,
-                                uncheckedColor = ErrorRed
-                            ),
-                            // Utiliser pour supprimer le padding autour du checkbox
-                            modifier = Modifier.size(20.dp)
-                        )
+                    CustomDeleteCheckBox(
+                        deleteChecked = deleteChecked,
+                        onDeleteCheckedChange = {
+                            onDeleteCheckedChange(it)
+                        },
+                        modifier = Modifier.size(20.dp)
+                    )
                 } else {
-                    // -> Bouton qui sert à mettre l'article dans le caddy => TODO()
+                    // -> Bouton qui sert à mettre l'article dans le caddy.
                     Checkbox(
                         checked = inCaddyChecked,
                         onCheckedChange = {
@@ -117,13 +112,13 @@ fun WishItem(
                         colors = CheckboxDefaults.colors(
                             checkmarkColor = White,
                             checkedColor = Green,
-                            uncheckedColor = BlueNeutral
+                            uncheckedColor = SoftBlue
                         ),
-                        // Utiliser pour supprimer le padding autour du checkbox
+                        // Utiliser pour supprimer le padding autour de la case à cocher.
                         modifier = Modifier.size(20.dp)
                     )
                 }
-                // -> Quantité du produit.
+                // -> Quantité de l'article.
                 Text(
                     text = "${item.quantity}",
                     color = BlueNeutral,
@@ -133,7 +128,7 @@ fun WishItem(
                     modifier = Modifier.padding(start = 10.dp)
                 )
 
-                // -> Nom du produit.
+                // -> Nom de l'article.
                 Text(
                     text = item.name,
                     fontSize = 15.5.sp,

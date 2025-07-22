@@ -45,7 +45,7 @@ import com.projects.writeit.feature_product.presentation.list_product.components
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.util.TabItem
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
 import com.projects.writeit.ui.theme.Black
-import com.projects.writeit.ui.theme.BluePrimary
+import com.projects.writeit.ui.theme.BlueAccent
 import com.projects.writeit.ui.theme.White
 import com.projects.writeit.ui.theme.darkAccentColor
 import com.projects.writeit.ui.theme.latoFamily
@@ -162,7 +162,7 @@ fun ProductsScreen(
                     )
                 },
                 colors = TopAppBarColors(
-                    containerColor = BluePrimary,
+                    containerColor = BlueAccent,
                     scrolledContainerColor = Black,
                     navigationIconContentColor = White,
                     titleContentColor = White,

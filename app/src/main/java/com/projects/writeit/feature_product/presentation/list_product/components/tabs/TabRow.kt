@@ -16,9 +16,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.util.TabItem
+import com.projects.writeit.ui.theme.BlueGrey
 import com.projects.writeit.ui.theme.BlueNeutral
 import com.projects.writeit.ui.theme.BluePrimary
-import com.projects.writeit.ui.theme.SoftPink
 import com.projects.writeit.ui.theme.White
 import kotlinx.coroutines.launch
 
@@ -43,7 +43,7 @@ fun CustomTabRow(
     val selectedColor = if (selectedTabIndex == 0) {
         BluePrimary // Couleur bleue pour la wishlist
     } else {
-        SoftPink // Couleur rose saumon pour la liste Caddy
+        BlueGrey // Couleur bleu clair pour la liste Caddy
     }
 
     // -> CoroutineScope utilisé pour animer la transition vers un autre onglet au clic.
@@ -85,7 +85,7 @@ fun CustomTabRow(
         // CaddyTab
         Tab(
             selected = selectedTabIndex == 1,
-            selectedContentColor = SoftPink,
+            selectedContentColor = BlueGrey,
             unselectedContentColor = BlueNeutral,
             onClick = {
                 // -> Lance une animation pour faire défiler le pager vers la page correspondante.
