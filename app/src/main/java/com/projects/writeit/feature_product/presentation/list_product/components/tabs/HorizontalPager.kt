@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditViewModel
 import com.projects.writeit.feature_product.presentation.list_product.MainViewModel
 import com.projects.writeit.feature_product.presentation.list_product.components.lists.ArchivedList
-import com.projects.writeit.feature_product.presentation.list_product.components.lists.ShopList
+import com.projects.writeit.feature_product.presentation.list_product.components.lists.WishList
 
 /**
  * Composable représentant un système d'onglets horizontal avec contenu dynamique.
@@ -35,7 +35,7 @@ fun CustomHorizontalPager(viewModel: MainViewModel,
         // -> En fonction de la page active le système s'aligne dynamiquement
         // -> pour affiché le contenu qui lui correspond.
         when(pagerState.currentPage){
-            0 -> ShopList(viewModel,addEditViewModel)
+            0 -> WishList(viewModel,addEditViewModel)
             1 -> ArchivedList(viewModel)
         }
     }

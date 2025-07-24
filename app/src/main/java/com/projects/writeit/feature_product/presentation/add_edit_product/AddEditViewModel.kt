@@ -69,7 +69,6 @@ class AddEditViewModel @Inject constructor(
 
     private var fOriginalItem : Item? = null
 
-
     //---------------------------------------------------------------------------------------
     // -- VIEW MODEL FUNCTIONS -->
     //------------------------------------

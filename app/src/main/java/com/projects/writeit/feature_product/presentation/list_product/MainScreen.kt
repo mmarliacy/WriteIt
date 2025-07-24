@@ -2,10 +2,14 @@ package com.projects.writeit.feature_product.presentation.list_product
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FabPosition
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
@@ -31,21 +35,24 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditDialog
 import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditViewModel
 import com.projects.writeit.feature_product.presentation.list_product.components.bottom_app_bar.SortDropDownMenu
-import com.projects.writeit.feature_product.presentation.list_product.components.lists.ShopList
+import com.projects.writeit.feature_product.presentation.list_product.components.lists.WishList
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.CustomHorizontalPager
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.CustomTabRow
 import com.projects.writeit.feature_product.presentation.list_product.components.tabs.util.TabItem
 import com.projects.writeit.feature_product.presentation.list_product.util.ProductsEvent
 import com.projects.writeit.ui.theme.Black
 import com.projects.writeit.ui.theme.BlueAccent
+import com.projects.writeit.ui.theme.BluePrimary
 import com.projects.writeit.ui.theme.White
 import com.projects.writeit.ui.theme.darkAccentColor
 import com.projects.writeit.ui.theme.latoFamily
@@ -102,13 +109,12 @@ fun ProductsScreen(
 
     val productToEdit = viewModel.itemToEdit.value
 
-
     //---------------------------------------------------------------------------------------
     // -> Effet lancé une seule fois lors de la 1ère composition.
     // -> Il observe les flux d’événements des deux ViewModels et affiche des snackbars en conséquence.
     //------------------------------------
     LaunchedEffect(
-        true
+        true, productToEdit
     ) {
         launch {
             editViewModel.eventFlow.collectLatest { event ->
@@ -189,11 +195,20 @@ fun ProductsScreen(
                             )
                         }
                     }
-                    Text(
-                        text = "$currentSum €",
-                        modifier = Modifier.padding(end = 20.dp),
-                        color = Color.White
-                    )
+
+
+                        Row (
+                            modifier = modifier.clip(shape = RoundedCornerShape(10.dp)).background(White).padding(10.dp)
+                        ){
+                            Text(
+                                text = "$currentSum €",
+                                color = BluePrimary
+                            )
+                        }
+                        Box(
+                            modifier = modifier.size(10.dp)
+                        )
+
                 }
             )
         },
@@ -297,12 +312,19 @@ fun ProductsScreen(
                 pagerState
             )
 
-            ShopList(
+            WishList(
                 viewModel = viewModel,
                 editViewModel = editViewModel
             )
         }
     }
+}
+
+
+@Preview
+@Composable
+fun ShowMeMainScreen(){
+    ProductsScreen()
 }
 
 

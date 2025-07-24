@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import com.projects.writeit.feature_product.presentation.add_edit_product.AddEditViewModel
@@ -32,7 +31,7 @@ import com.projects.writeit.feature_product.presentation.list_product.util.Produ
  * @param editViewModel utilisé lors de la mise à jour d'un produit.
  */
 @Composable
-fun ShopList(
+fun WishList(
     viewModel: MainViewModel,
     editViewModel: AddEditViewModel
 ) {
@@ -78,11 +77,12 @@ fun ShopList(
                         viewModel.onEvent(ProductsEvent.PutInTheCaddy(pItem = selectableProduct.item))
                     },
                     onClickItem = {
-                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                         viewModel.onEvent(ProductsEvent.ToggleBottomDialog)
                         selectableProduct.item.id?.let {
                             if (it != viewModel.itemToEdit.value?.id) {
+                                // On fetch l'item cliqué avec l'item en view model
                                 viewModel.productToEdit(pItem = selectableProduct.item)
+
                                 editViewModel.onEvent(
                                     AddEditItemEvent.GetProductToEdit(
                                         pItem = selectableProduct.item

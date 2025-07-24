@@ -197,9 +197,9 @@ class MainViewModel @Inject constructor(
                         // 3. L'insérer
                         productUseCases.pInsertItem(updatedItem)
 
-                        _eventFlow.emit(UiEvent.ShowSnackBar("${updatedItem.name} a été archivé"))
+                        _eventFlow.emit(UiEvent.ShowSnackBar("${updatedItem.name} a été ajouté au caddy."))
                     } catch (e: Exception) {
-                        _eventFlow.emit(UiEvent.ShowSnackBar("${event.pItem.name} n'a pas été archivé"))
+                        _eventFlow.emit(UiEvent.ShowSnackBar("${event.pItem.name} n'a pas été ajouté au caddy."))
                     }
                 }
             }
