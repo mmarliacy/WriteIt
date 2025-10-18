@@ -77,7 +77,8 @@ fun AddEditDialog(
     val itemPosition = remember {
         mutableIntStateOf(0)
     }
-    var selectedCategory = editViewModel.categoryList.value.getOrNull(itemPosition.intValue) ?: ""
+    val categoryList = editViewModel.categoryList.value
+    var selectedCategory = categoryList.getOrNull(itemPosition.intValue) ?: "Indéfini"
 
 
     //---------------------------------------------------------------------------------------
@@ -191,7 +192,10 @@ fun AddEditDialog(
         ) {
             OutlinedTextField(
                 value = selectedCategory,
-                onValueChange = { selectedCategory = it },
+                onValueChange = {
+                    selectedCategory = it
+                    AddEditItemEvent.SelectCategory(it)
+                                },
                 readOnly = true,
                 label = { },
                 modifier = Modifier
@@ -219,6 +223,7 @@ fun AddEditDialog(
                             itemPosition.intValue = index
                             expanded = false
                             selectedCategory = editViewModel.categoryList.value[index]
+                            editViewModel.onEvent(AddEditItemEvent.SelectCategory(selectedCategory))
                         }
                     )
                 }

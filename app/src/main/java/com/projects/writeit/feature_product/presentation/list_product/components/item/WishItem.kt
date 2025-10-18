@@ -128,14 +128,27 @@ fun WishItem(
                     modifier = Modifier.padding(start = 10.dp)
                 )
 
-                // -> Nom de l'article.
-                Text(
-                    text = item.name,
-                    fontSize = 15.5.sp,
-                    fontFamily = latoFamily,
-                    fontWeight = FontWeight.Normal,
+                Column (
                     modifier = Modifier.padding(start = 10.dp)
-                )
+                ){
+                    // -> Nom de l'article.
+                    Text(
+                        text = item.name,
+                        fontSize = 15.5.sp,
+                        fontFamily = latoFamily,
+                        fontWeight = FontWeight.Normal,
+                    )
+                    item.category?.let{
+                        Text(
+                            text = it,
+                            fontSize = 10.sp,
+                            color = BlueNeutral,
+                            fontFamily = latoFamily,
+                            fontWeight = FontWeight.Normal,
+                        )
+                }
+            }
+
             }
             Surface(
                 shape = RoundedCornerShape(5.dp),
