@@ -14,8 +14,6 @@ data class Item (
     val timestamp: Long,
     val isInTheCaddy: Boolean = false
 ){
-    /**
-     * Liste des catégories possible pour un produit.
     companion object {
         val categories = listOf(
             "Indéfini",
@@ -32,5 +30,4 @@ data class Item (
              "Sans catégorie",
         )
     }
-    */
 }

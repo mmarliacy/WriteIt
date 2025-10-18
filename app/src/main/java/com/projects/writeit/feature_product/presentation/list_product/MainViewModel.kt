@@ -157,7 +157,7 @@ class MainViewModel @Inject constructor(
             // Active/Désactive le dialogue d'édition de produit.
             is ProductsEvent.ToggleBottomDialog -> {
                 _state.value = state.value.copy(
-                    showBottomSheet = !state.value.showBottomSheet
+                    bottomSheetIsVisible = !state.value.bottomSheetIsVisible
                 )
             }
 
@@ -165,6 +165,12 @@ class MainViewModel @Inject constructor(
             is ProductsEvent.ToggleSortDropDownMenu -> {
                 _state.value = state.value.copy(
                     sortDropDownExpanded = !state.value.sortDropDownExpanded
+                )
+            }
+            // Affiche la bottom App Bar en fonction du formulaire.
+            is ProductsEvent.SetBottomBarVisibility -> {
+                _state.value = state.value.copy(
+                    bottomAppBarIsVisible = event.isVisible
                 )
             }
 

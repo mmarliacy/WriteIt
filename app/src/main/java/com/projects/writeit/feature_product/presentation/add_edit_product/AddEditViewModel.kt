@@ -37,6 +37,12 @@ class AddEditViewModel @Inject constructor(
     )
     val state: State<AddEditItemState> = _state
 
+    private val _categoryList = mutableStateOf(Item.categories)
+
+    val categoryList : State<List<String>> = _categoryList
+
+
+
     // -- Etat du nom du produit (modifiable + lecture seule).
     private val _productName = mutableStateOf(
         ItemTextFieldState(
@@ -91,6 +97,11 @@ class AddEditViewModel @Inject constructor(
             priceError = null,
             quantityError = null
         )
+    }
+
+    // -> Afficher les catégories disponibles pour donner une idée plus précise de l'article
+    fun displayCategoryList(){
+
     }
 
     // -> On ajoute le produit édité suivi de l'animation.

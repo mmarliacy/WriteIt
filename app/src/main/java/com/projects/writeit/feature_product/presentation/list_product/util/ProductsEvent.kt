@@ -17,9 +17,11 @@ sealed class ProductsEvent {
     data class DisArchiveProduct(val pItem: Item): ProductsEvent()
     data class ToggleProductSelection(val productId: Int, val isChecked: Boolean): ProductsEvent()
     data class DeleteSelectedProducts(val productsToDelete: List<SelectableProduct>): ProductsEvent()
+    data class SetBottomBarVisibility(val isVisible: Boolean) : ProductsEvent()
     data object ToggleSortDropDownMenu : ProductsEvent()
     data object ToggleProductSelectionMode : ProductsEvent()
     data object RestoreProduct : ProductsEvent()
     data object RestoreAllProducts : ProductsEvent()
     data object ToggleBottomDialog : ProductsEvent()
+
 }

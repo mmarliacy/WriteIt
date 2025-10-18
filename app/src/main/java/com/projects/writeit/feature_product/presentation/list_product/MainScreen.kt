@@ -1,39 +1,46 @@
 package com.projects.writeit.feature_product.presentation.list_product
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.FabPosition
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarResult
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EuroSymbol
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Restore
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -99,15 +106,24 @@ fun ProductsScreen(
     val pagerState = rememberPagerState(pageCount = { TabItem.entries.size })
 
     // → Il s'agit du montant total des produits constamment observé via State Flow et collectAsState().
-    val currentSum by viewModel.totalPriceSum.collectAsState()
+    val currentSum by viewModel.totalPriceSum.collectAsState(initial = 0f)
 
     // -> État complet de l’écran, exposé par le ProductsViewModel.
     val state = viewModel.state.value
 
     // -> Etat du conteneur de l'écran.
-    val scaffoldState = rememberScaffoldState()
+    val sheetState = rememberStandardBottomSheetState(
+        initialValue = SheetValue.Hidden,   // ou PartiallyExpanded si tu préfères
+        skipHiddenState = false             // <— ici, pas dans rememberBottomSheetScaffoldState
+    )
 
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = sheetState
+    )
+
+    // -> Produit à éditer dans le dialogue
     val productToEdit = viewModel.itemToEdit.value
+
 
     //---------------------------------------------------------------------------------------
     // -> Effet lancé une seule fois lors de la 1ère composition.
@@ -119,7 +135,7 @@ fun ProductsScreen(
         launch {
             editViewModel.eventFlow.collectLatest { event ->
                 if (event is AddEditViewModel.UiEvent.ShowSnackBar) {
-                    scaffoldState.snackbarHostState.showSnackbar(event.message)
+                    bottomSheetScaffoldState.snackbarHostState.showSnackbar(event.message)
                 }
             }
         }
@@ -127,17 +143,21 @@ fun ProductsScreen(
             viewModel.eventFlow.collectLatest { event ->
                 if (event is MainViewModel.UiEvent.ShowSnackBar) {
                     Log.d("SNACKBAR_EVENT", "Message reçu : ${event.message}")
-                     val result = scaffoldState.snackbarHostState.showSnackbar(
+                    val result = bottomSheetScaffoldState.snackbarHostState.showSnackbar(
                         message = event.message,
-                        actionLabel = "Annuler")
+                        actionLabel = "Annuler"
+                    )
 
-                    when(result){
-                       SnackbarResult.ActionPerformed -> {
+                    when (result) {
+                        SnackbarResult.ActionPerformed -> {
                             viewModel.onEvent(ProductsEvent.RestoreProduct)
-                       }
-                    SnackbarResult.Dismissed -> {
-                        scaffoldState.snackbarHostState
-                    }
+                        }
+
+                        SnackbarResult.Dismissed -> {
+                            bottomSheetScaffoldState.snackbarHostState
+                        }
+
+                        else -> {}
                     }
                 }
             }
@@ -149,57 +169,78 @@ fun ProductsScreen(
         }
     }
 
+    // → Ouvre/ferme la bottom sheet selon ton booléen
+    LaunchedEffect(key1 = state.bottomSheetIsVisible) {
+        if (state.bottomSheetIsVisible) {
+            bottomSheetScaffoldState.bottomSheetState.expand()
+        } else {
+            bottomSheetScaffoldState.bottomSheetState.hide() // ou collapse()
+        }
+    }
+
+    LaunchedEffect(bottomSheetScaffoldState.bottomSheetState) {
+        snapshotFlow { bottomSheetScaffoldState.bottomSheetState.currentValue }
+            .collect { currentValue ->
+                if (currentValue == SheetValue.Hidden){
+                    viewModel.onEvent(ProductsEvent.SetBottomBarVisibility(true))
+                } else
+                    viewModel.onEvent(ProductsEvent.SetBottomBarVisibility(false))
+            }
+    }
+
     // Scaffold principal de l’écran : gère l'agencement général (topBar, bottomBar, FAB, contenu).
     // Il intègre également un snackbarHost pour l'affichage des messages utilisateur.
-    Scaffold(
-        scaffoldState = scaffoldState,
-        snackbarHost = { SnackbarHost(hostState = scaffoldState.snackbarHostState) },
-        // Barre supérieure de l’écran contenant le titre,
-        // le montant total et le bouton "Supprimer" si une sélection est active.
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Ma liste de courses",
-                        color = White,
-                        fontFamily = latoFamily,
-                        fontWeight = FontWeight.Black,
-                        fontSize = 16.sp
-                    )
-                },
-                colors = TopAppBarColors(
-                    containerColor = BlueAccent,
-                    scrolledContainerColor = Black,
-                    navigationIconContentColor = White,
-                    titleContentColor = White,
-                    actionIconContentColor = White
+    Box(modifier = modifier.fillMaxSize()) {
+        BottomSheetScaffold(
+            scaffoldState = bottomSheetScaffoldState,
+            snackbarHost = { SnackbarHost(hostState = bottomSheetScaffoldState.snackbarHostState) },
+            // Barre supérieure de l’écran contenant le titre,
+            // le montant total et le bouton "Supprimer" si une sélection est active.
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Ma liste de courses",
+                            color = White,
+                            fontFamily = latoFamily,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 16.sp
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = BlueAccent,
+                        scrolledContainerColor = Black,
+                        navigationIconContentColor = White,
+                        titleContentColor = White,
+                        actionIconContentColor = White
 
-                ),
-                // Actions situées à droite du titre :
-                // - Affichage du montant total des produits
-                // - Bouton "Supprimer" visible uniquement en mode sélection multiple
-                actions = {
-                    // Affiche le bouton "Supprimer" lorsque des produits sont sélectionnés.
-                    // En cliquant dessus, l’événement `DeleteSelectedProducts` est déclenché,
-                    // ce qui supprime les produits cochés de la base de données locale.
-                    if (state.buttonDeleteIsVisible) {
-                        TextButton(
-                            onClick = {
-                                viewModel.onEvent(ProductsEvent.DeleteSelectedProducts(state.selectableActiveProducts))
+                    ),
+                    // Actions situées à droite du titre :
+                    // - Affichage du montant total des produits
+                    // - Bouton "Supprimer" visible uniquement en mode sélection multiple
+                    actions = {
+                        // Affiche le bouton "Supprimer" lorsque des produits sont sélectionnés.
+                        // En cliquant dessus, l’événement `DeleteSelectedProducts` est déclenché,
+                        // ce qui supprime les produits cochés de la base de données locale.
+                        if (state.buttonDeleteIsVisible) {
+                            TextButton(
+                                onClick = {
+                                    viewModel.onEvent(ProductsEvent.DeleteSelectedProducts(state.selectableActiveProducts))
+                                }
+                            ) {
+                                Text(
+                                    text = "Supprimer",
+                                    modifier = Modifier.padding(end = 20.dp),
+                                    color = Color.White
+                                )
                             }
-                        ) {
-                            Text(
-                                text = "Supprimer",
-                                modifier = Modifier.padding(end = 20.dp),
-                                color = Color.White
-                            )
                         }
-                    }
 
 
-                        Row (
-                            modifier = modifier.clip(shape = RoundedCornerShape(10.dp)).background(White).padding(10.dp)
-                        ){
+                        Row(
+                            modifier = modifier.clip(shape = RoundedCornerShape(10.dp))
+                                .background(White).padding(10.dp)
+                        ) {
                             Text(
                                 text = "$currentSum €",
                                 color = BluePrimary
@@ -209,114 +250,124 @@ fun ProductsScreen(
                             modifier = modifier.size(10.dp)
                         )
 
-                }
-            )
-        },
-        // Barre inférieure avec les actions principales :
-        // - Tri (affiche SortDropDownMenu)
-        // - Budgétisation (à implémenter)
-        // - Activation du mode suppression multiple
-        // + FloatingActionButton selon l’onglet actif.
-        bottomBar = {
-            BottomAppBar(
-                actions = {
-                    IconButton(onClick = {
-                        viewModel.onEvent(ProductsEvent.ToggleSortDropDownMenu)
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.FilterList,
-                            contentDescription = "SortButton"
-                        )
-                        SortDropDownMenu(
-                            expanded = state.sortDropDownExpanded,
-                            onDismiss = {
-                                viewModel.onEvent(ProductsEvent.ToggleSortDropDownMenu)
-                            }
-                        )
                     }
-                    IconButton(onClick = {
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.EuroSymbol,
-                            contentDescription = "BudgetButton"
-                        )
-                    }
-                    IconButton(onClick = {
-                        viewModel.onEvent(ProductsEvent.ToggleProductSelectionMode)
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = "DeleteButton"
-                        )
-                    }
-                },
-                // Bouton d’action flottant adapté à l’onglet actif :
-                // - Onglet actif (0) : ajout d’un nouveau produit
-                // - Onglet archivés (1) : restauration des produits archivés
-                floatingActionButton = {
-                    when (pagerState.currentPage) {
-                        0 -> {
-                            FloatingActionButton(containerColor = Color.Black,
-                                contentColor = Color.White,
-                                onClick = {
-                                    editViewModel.prepareForNewProduct()
-                                    viewModel.onEvent(ProductsEvent.ToggleBottomDialog)
-                                }) {
-                                Icon(Icons.Filled.Add, "Open Add dialog")
-                            }
-                        }
-                        1 -> {
-                            FloatingActionButton(containerColor = darkAccentColor,
-                                contentColor = Color.White,
-                                onClick = {
-                                    viewModel.onEvent(ProductsEvent.RestoreAllProducts)
-                                }) {
-                                Icon(Icons.Filled.Restore, "Restore All")
-                            }
-                        }
-                    }
-                }
-            )
-        },
-
-        floatingActionButtonPosition = FabPosition.End,
-        modifier = modifier.fillMaxSize(),
-    ) {
-        if (state.showBottomSheet) {
-            // Dialogue d’ajout/édition affiché en bas de l’écran si `showBottomSheet` est actif.
-            AddEditDialog(
-                onDismiss = {
-                    viewModel.onEvent(ProductsEvent.ToggleBottomDialog)
-                },
-                modifier = Modifier
-            )
-        }
-        // Contenu principal de l’écran :
-        // - Onglets (`CustomTabRow`)
-        // - Navigation entre listes (`CustomHorizontalPager`)
-        // - Liste des produits actifs (`ShopList`)
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    top = it.calculateTopPadding(),
-                    bottom = it.calculateBottomPadding()
                 )
-                .background(White)
-        ) {
-            CustomTabRow(pagerState = pagerState)
+            },
+            // Barre inférieure avec les actions principales :
+            // - Tri (affiche SortDropDownMenu)
+            // - Budgétisation (à implémenter)
+            // - Activation du mode suppression multiple
+            sheetContent = {
+                // Dialogue d’ajout/édition affiché en bas de l’écran si `showBottomSheet` est actif.
+                AddEditDialog(
+                    onDismiss = {
+                        viewModel.onEvent(ProductsEvent.ToggleBottomDialog)
+                    },
+                    modifier = Modifier
+                )
+            },
 
-            CustomHorizontalPager(
-                viewModel,
-                editViewModel,
-                pagerState
-            )
+            content = {
+                // Contenu principal de l’écran :
+                // - Onglets (`CustomTabRow`)
+                // - Navigation entre listes (`CustomHorizontalPager`)
+                // - Liste des produits actifs (`ShopList`)
+                // + FloatingActionButton selon l’onglet actif.
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            top = it.calculateTopPadding(),
+                            bottom = it.calculateBottomPadding()
+                        )
+                        .background(White)
+                ) {
+                    CustomTabRow(pagerState = pagerState)
 
-            WishList(
-                viewModel = viewModel,
-                editViewModel = editViewModel
-            )
-        }
+                    CustomHorizontalPager(
+                        viewModel,
+                        editViewModel,
+                        pagerState
+                    )
+
+                    WishList(
+                        viewModel = viewModel,
+                        editViewModel = editViewModel
+                    )
+
+                }
+            }
+        )
+
+            AnimatedVisibility(
+                visible = state.bottomAppBarIsVisible,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+            ) {
+                BottomAppBar(
+                    actions = {
+                        IconButton(onClick = {
+                            viewModel.onEvent(ProductsEvent.ToggleSortDropDownMenu)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.FilterList,
+                                contentDescription = "SortButton"
+                            )
+                            SortDropDownMenu(
+                                expanded = state.sortDropDownExpanded,
+                                onDismiss = {
+                                    viewModel.onEvent(ProductsEvent.ToggleSortDropDownMenu)
+                                }
+                            )
+                        }
+                        IconButton(onClick = {
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.EuroSymbol,
+                                contentDescription = "BudgetButton"
+                            )
+                        }
+                        IconButton(onClick = {
+                            viewModel.onEvent(ProductsEvent.ToggleProductSelectionMode)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "DeleteButton"
+                            )
+                        }
+                    },
+                    // Bouton d’action flottant adapté à l’onglet actif :
+                    // - Onglet actif (0) : ajout d’un nouveau produit
+                    // - Onglet archivés (1) : restauration des produits archivés
+                    floatingActionButton = {
+                        when (pagerState.currentPage) {
+                            0 -> {
+                                FloatingActionButton(containerColor = Color.Black,
+                                    contentColor = Color.White,
+                                    onClick = {
+                                        editViewModel.prepareForNewProduct()
+                                        viewModel.onEvent(ProductsEvent.ToggleBottomDialog)
+                                    }) {
+                                    Icon(Icons.Filled.Add, "Open Add dialog")
+                                }
+                            }
+
+                            1 -> {
+                                FloatingActionButton(containerColor = darkAccentColor,
+                                    contentColor = Color.White,
+                                    onClick = {
+                                        viewModel.onEvent(ProductsEvent.RestoreAllProducts)
+                                    }) {
+                                    Icon(Icons.Filled.Restore, "Restore All")
+                                }
+                            }
+                        }
+                    }
+                )
+            }
     }
 }
 

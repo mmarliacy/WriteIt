@@ -16,8 +16,9 @@ data class ProductsState(
     val pArchivedItems: List<Item> = emptyList(),
     val productsOrder: ItemOrder = ItemOrder.Date(OrderType.AscendingOrder),
     val isDeletedProductIsVisible: Boolean = true,
-    val showBottomSheet : Boolean = false,
+    val bottomSheetIsVisible : Boolean = false,
     val isSelectionMode: Boolean = false,
     val buttonDeleteIsVisible: Boolean = false,
-    val sortDropDownExpanded: Boolean = false
+    val sortDropDownExpanded: Boolean = false,
+    val bottomAppBarIsVisible : Boolean = true
 )

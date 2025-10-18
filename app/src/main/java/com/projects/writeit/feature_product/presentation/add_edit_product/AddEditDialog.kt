@@ -2,6 +2,7 @@ package com.projects.writeit.feature_product.presentation.add_edit_product
 
 
 //noinspection UsingMaterialAndMaterial3Libraries
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,15 +11,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -45,26 +54,31 @@ import kotlinx.coroutines.flow.collectLatest
  * grâce à la collecte d’un événement `UiEvent.SaveProduct`.
  *
  * @param onDismiss Fonction appelée lors de la fermeture du dialogue.
- * @param viewModel ViewModel injecté pour gérer l’état et les événements.
+ * @param editViewModel ViewModel injecté pour gérer l’état et les événements.
  * @param modifier Permet d'ajuster l’apparence depuis l’extérieur si nécessaire.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditDialog(
     onDismiss: () -> Unit,
-    viewModel: AddEditViewModel = hiltViewModel(),
+    editViewModel: AddEditViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
 
-    val state = viewModel.state.value
+    val state = editViewModel.state.value
 
     // -- Etats des caractéristiques du produit utilisable en lecture seule dans l'UI, provenant du View Model.
-    val productNameState = viewModel.productName.value
-    val productQuantityState = viewModel.productQuantity.value
-    val productPriceState = viewModel.productPrice.value
+    val productNameState = editViewModel.productName.value
+    val productQuantityState = editViewModel.productQuantity.value
+    val productPriceState = editViewModel.productPrice.value
+
+    // -- Etats du drop down menu contenant les catégories de produits
+    var expanded by remember { mutableStateOf(false) }
+    val itemPosition = remember {
+        mutableIntStateOf(0)
+    }
+    var selectedCategory = editViewModel.categoryList.value.getOrNull(itemPosition.intValue) ?: ""
+
 
     //---------------------------------------------------------------------------------------
     // -> Effet lancé une seule fois à la composition du composable.
@@ -74,128 +88,163 @@ fun AddEditDialog(
     LaunchedEffect(
         key1 = true
     ) {
-        viewModel.eventFlow.collectLatest { event ->
+        editViewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is AddEditViewModel.UiEvent.ExitTheDialog -> {
                     onDismiss()
                 }
+
                 else -> Unit
             }
         }
     }
+
 
     //---------------------------------------------------------------------------------------
     // -- DIALOGUE D'AJOUT DE PRODUIT -->
     // -> Boîte de dialogue qui s'affiche en bas de l'écran et contient l'ensemble du formulaire d'ajout/édition de produit.
     // -> Se ferme soit en balayant vers le bas, soit en appelant la fonction `onDismiss`.
     //------------------------------------
-    ModalBottomSheet(
-        onDismissRequest = {
-            onDismiss()
-        },
-        sheetState = sheetState,
-        containerColor = Color.White,
-
-        ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.Top
-        ) {
-            CustomTitle(
-                title = "Ajoute ton produit",
-                fontFamily = latoFamily,
-                fontWeight = FontWeight.SemiBold,
-                size = 25.sp,
-                fontStyle = FontStyle.Normal
-            )
-        }
-        HorizontalDivider(
-            thickness = 0.5.dp,
-            color = darkAccentColor,
-            modifier = modifier.fillMaxWidth()
+    // Ton contenu actuel du ModalBottomSheet ici
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 10.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.Top
+    ) {
+        CustomTitle(
+            title = "Ajoute ton produit",
+            fontFamily = latoFamily,
+            fontWeight = FontWeight.SemiBold,
+            size = 25.sp,
+            fontStyle = FontStyle.Normal
         )
-        Column(
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.spacedBy(15.dp),
-            modifier = Modifier
-                .padding(15.dp)
-        ) {
+    }
+    HorizontalDivider(
+        thickness = 0.5.dp,
+        color = darkAccentColor,
+        modifier = modifier.fillMaxWidth()
+    )
+    Column(
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(15.dp),
+        modifier = Modifier
+            .padding(15.dp)
+    ) {
 
-            //---------------------------------------------------------------------------------------
-            // -- CHAMPS DE TEXTE A REMPLIR -->
-            // -> Champs de texte reliés au ViewModel des événements,
-            // -> qui permettent de saisir le nom, la quantité, et le prix d'un produit,
-            // -- Selon des conditions (error) définies (Non vide, > 0) qui filtre les erreurs.
-            //------------------------------------
+        //---------------------------------------------------------------------------------------
+        // -- CHAMPS DE TEXTE A REMPLIR -->
+        // -> Champs de texte reliés au ViewModel des événements,
+        // -> qui permettent de saisir le nom, la quantité, et le prix d'un produit,
+        // -- Selon des conditions (error) définies (Non vide, > 0) qui filtre les erreurs.
+        //------------------------------------
 
-            TransparentTextField(
-                modifier = modifier.testTag("nameText"),
-                text = productNameState.nameText,
-                hint = productNameState.hint,
-                onValueChange = { productName ->
-                    viewModel.onEvent(AddEditItemEvent.EnteredName(productName))
-                },
-                onFocusChange = { productName ->
-                    viewModel.onEvent(AddEditItemEvent.ChangeNameFocus(productName))
-                },
-                isHintVisible = productNameState.isHintVisible,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                isError = state.nameError != null,
-                supportingErrorText = state.nameError
+        TransparentTextField(
+            modifier = modifier.testTag("nameText"),
+            text = productNameState.nameText,
+            hint = productNameState.hint,
+            onValueChange = { productName ->
+                editViewModel.onEvent(AddEditItemEvent.EnteredName(productName))
+            },
+            onFocusChange = { productName ->
+                editViewModel.onEvent(AddEditItemEvent.ChangeNameFocus(productName))
+            },
+            isHintVisible = productNameState.isHintVisible,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            isError = state.nameError != null,
+            supportingErrorText = state.nameError
+        )
+
+        Spacer(
+            modifier = Modifier.height(5.dp)
+        )
+
+        // -> Champ pour saisir la quantité.
+        TransparentTextField(
+            modifier = modifier.testTag("quantityText"),
+            text = productQuantityState.quantityText,
+            hint = productQuantityState.hint,
+            onValueChange = { productQuantity ->
+                editViewModel.onEvent(
+                    AddEditItemEvent.EnteredQuantity(
+                        productQuantity
+                    )
                 )
-
-            Spacer(
-                modifier = Modifier.height(5.dp)
-            )
-
-            // -> Champ pour saisir la quantité.
-            TransparentTextField(
-                modifier = modifier.testTag("quantityText"),
-                text = productQuantityState.quantityText,
-                hint = productQuantityState.hint,
-                onValueChange = { productQuantity ->
-                    viewModel.onEvent(
-                        AddEditItemEvent.EnteredQuantity(
-                            productQuantity
-                        )
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            onFocusChange = { productQuantity ->
+                editViewModel.onEvent(
+                    AddEditItemEvent.ChangeQuantityFocus(
+                        productQuantity
                     )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                onFocusChange = { productQuantity ->
-                    viewModel.onEvent(
-                        AddEditItemEvent.ChangeQuantityFocus(
-                            productQuantity
-                        )
-                    )
-                },
-                isHintVisible = productQuantityState.isHintVisible,
-                isError = state.quantityError != null,
-                supportingErrorText = state.quantityError
-            )
-            Spacer(
-                modifier = Modifier.height(5.dp)
-            )
+                )
+            },
+            isHintVisible = productQuantityState.isHintVisible,
+            isError = state.quantityError != null,
+            supportingErrorText = state.quantityError
+        )
 
-            // -> Champ pour saisir le prix.
-            TransparentTextField(
-                modifier = modifier.testTag("priceText"),
-                text = productPriceState.priceText,
-                hint = productPriceState.hint,
-                onValueChange = { productPrice ->
-                    viewModel.onEvent(AddEditItemEvent.EnteredPrice(productPrice))
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                onFocusChange = { productPrice ->
-                    viewModel.onEvent(AddEditItemEvent.ChangePriceFocus(productPrice))
-                },
-                isHintVisible = productPriceState.isHintVisible,
-                isError = state.priceError != null,
-                supportingErrorText = state.priceError
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            OutlinedTextField(
+                value = selectedCategory,
+                onValueChange = { selectedCategory = it },
+                readOnly = true,
+                label = { },
+                modifier = Modifier
+                    .menuAnchor(
+                        type = MenuAnchorType.PrimaryNotEditable,
+                        enabled = true
+                    )
+                    .fillMaxWidth()
+                    .clickable {
+                        expanded = !expanded
+                    },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                }
             )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = modifier.fillMaxWidth(),
+            ) {
+                editViewModel.categoryList.value.forEachIndexed { index, category ->
+                    DropdownMenuItem(
+                        text = { Text(category) },
+                        onClick = {
+                            itemPosition.intValue = index
+                            expanded = false
+                            selectedCategory = editViewModel.categoryList.value[index]
+                        }
+                    )
+                }
+            }
         }
+
+        Spacer(
+            modifier = Modifier.height(5.dp)
+        )
+
+        // -> Champ pour saisir le prix.
+        TransparentTextField(
+            modifier = modifier.testTag("priceText"),
+            text = productPriceState.priceText,
+            hint = productPriceState.hint,
+            onValueChange = { productPrice ->
+                editViewModel.onEvent(AddEditItemEvent.EnteredPrice(productPrice))
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            onFocusChange = { productPrice ->
+                editViewModel.onEvent(AddEditItemEvent.ChangePriceFocus(productPrice))
+            },
+            isHintVisible = productPriceState.isHintVisible,
+            isError = state.priceError != null,
+            supportingErrorText = state.priceError
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -206,8 +255,9 @@ fun AddEditDialog(
 
             // -> Bouton "OK" personnalisé pour enregistrer le produit dans la base de données locale.
             CustomButton {
-                viewModel.onEvent(AddEditItemEvent.SaveItem)
+                editViewModel.onEvent(AddEditItemEvent.SaveItem)
             }
+
         }
     }
 }
