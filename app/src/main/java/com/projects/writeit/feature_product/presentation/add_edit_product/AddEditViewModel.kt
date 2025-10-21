@@ -12,6 +12,8 @@ import com.projects.writeit.feature_product.presentation.add_edit_product.util.A
 import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditItemState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -37,9 +39,14 @@ class AddEditViewModel @Inject constructor(
     )
     val state: State<AddEditItemState> = _state
 
+    // -> Liste des catégories complète et filtrable
     private val _categoryList = mutableStateOf(Item.categories)
 
     val categoryList : State<List<String>> = _categoryList
+
+    private val _suggestions = MutableStateFlow(Item.categories)
+    val suggestions : StateFlow<List<String>> = _suggestions
+    //-----------------------
 
     // -- Etat du nom du produit (modifiable + lecture seule).
     private val _productName = mutableStateOf(
@@ -226,6 +233,30 @@ class AddEditViewModel @Inject constructor(
                 )
             }
 
+            // -> Vide la liste des suggestions en cas de perte de focus
+            is AddEditItemEvent.SetCategoryFocus -> {
+                if (!event.focusState.isFocused){
+                    _suggestions.value = emptyList()
+                }
+            }
+
+            // -> Vide la liste des suggestions
+            is AddEditItemEvent.ClearSuggestions -> {
+                _suggestions.value = emptyList()
+            }
+
+            // -> Met à jour la liste des suggestions en fonction des entrées utilisateur
+            is AddEditItemEvent.UpdateSuggestions -> {
+                _suggestions.value = if (event.suggestion.isNotEmpty()) {
+                    _categoryList.value.filter {
+                        it.contains(event.suggestion, ignoreCase = true)
+                    }
+                } else {
+                    emptyList()
+                }
+            }
+
+            // Met à jour la catégorie dans l'item
             is AddEditItemEvent.SelectCategory -> {
                 _state.value = state.value.copy(
                     category = event.categoryName

@@ -113,7 +113,7 @@ fun CaddyItem(
                     item.category?.let{
                         Text(
                             text = it,
-                            fontSize = 10.sp,
+                            fontSize = 12.sp,
                             color = BlueNeutral,
                             fontFamily = latoFamily,
                             fontWeight = FontWeight.Normal,

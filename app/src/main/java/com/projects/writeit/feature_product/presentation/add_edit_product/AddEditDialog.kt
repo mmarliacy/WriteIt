@@ -2,7 +2,6 @@ package com.projects.writeit.feature_product.presentation.add_edit_product
 
 
 //noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,14 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,6 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.projects.writeit.feature_product.presentation.add_edit_product.components.AutoCompleteTextField
 import com.projects.writeit.feature_product.presentation.add_edit_product.components.CustomButton
 import com.projects.writeit.feature_product.presentation.add_edit_product.components.CustomTitle
 import com.projects.writeit.feature_product.presentation.add_edit_product.components.TransparentTextField
@@ -135,10 +129,11 @@ fun AddEditDialog(
     ) {
 
         //---------------------------------------------------------------------------------------
-        // -- CHAMPS DE TEXTE A REMPLIR -->
+        // -- CHAMPS DE TEXTE A REMPLIR OU SÉLECTIONNER -->
         // -> Champs de texte reliés au ViewModel des événements,
-        // -> qui permettent de saisir le nom, la quantité, et le prix d'un produit,
+        // -> qui permettent de saisir le nom, la quantité, et le prix d'un produit
         // -- Selon des conditions (error) définies (Non vide, > 0) qui filtre les erreurs.
+        // -> Texte en saisie auto pour sélectionner la catégorie.
         //------------------------------------
 
         TransparentTextField(
@@ -186,49 +181,12 @@ fun AddEditDialog(
             supportingErrorText = state.quantityError
         )
 
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded }
-        ) {
-            OutlinedTextField(
-                value = selectedCategory,
-                onValueChange = {
-                    selectedCategory = it
-                    AddEditItemEvent.SelectCategory(it)
-                                },
-                readOnly = true,
-                label = { },
-                modifier = Modifier
-                    .menuAnchor(
-                        type = MenuAnchorType.PrimaryNotEditable,
-                        enabled = true
-                    )
-                    .fillMaxWidth()
-                    .clickable {
-                        expanded = !expanded
-                    },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                }
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = modifier.fillMaxWidth(),
-            ) {
-                editViewModel.categoryList.value.forEachIndexed { index, category ->
-                    DropdownMenuItem(
-                        text = { Text(category) },
-                        onClick = {
-                            itemPosition.intValue = index
-                            expanded = false
-                            selectedCategory = editViewModel.categoryList.value[index]
-                            editViewModel.onEvent(AddEditItemEvent.SelectCategory(selectedCategory))
-                        }
-                    )
-                }
-            }
-        }
+
+        AutoCompleteTextField(
+            modifier = Modifier,
+            onFocusChange = {
+                    editViewModel.onEvent(AddEditItemEvent.SetCategoryFocus(it))
+            })
 
         Spacer(
             modifier = Modifier.height(5.dp)
