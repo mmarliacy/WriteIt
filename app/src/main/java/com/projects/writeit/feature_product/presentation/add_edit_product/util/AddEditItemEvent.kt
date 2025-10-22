@@ -24,7 +24,8 @@ sealed class AddEditItemEvent{
     // Évènements liés au choix de la catégorie
     data class SelectCategory(val categoryName : String) : AddEditItemEvent()
     data class SetCategoryFocus(val focusState: FocusState) : AddEditItemEvent()
-    data class UpdateSuggestions(val suggestion : String) : AddEditItemEvent()
+    data class UpdateSuggestions(val query : String) : AddEditItemEvent()
+    data object ShowCategoryList : AddEditItemEvent()
     data object ClearSuggestions : AddEditItemEvent ()
 
 }

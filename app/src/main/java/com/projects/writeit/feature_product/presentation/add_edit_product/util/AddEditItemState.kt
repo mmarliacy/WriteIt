@@ -4,5 +4,6 @@ data class AddEditItemState (
     val nameError : String? = null,
     val quantityError : String? = null,
     val priceError : String? = null,
-    val category : String? = null
+    val category : String? = null,
+    val buttonCategoryPressed : Boolean = false
 )

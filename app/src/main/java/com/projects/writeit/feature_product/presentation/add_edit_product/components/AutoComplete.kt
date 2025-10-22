@@ -2,13 +2,20 @@ package com.projects.writeit.feature_product.presentation.add_edit_product.compo
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.material.icons.outlined.ArrowDropUp
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -50,28 +57,54 @@ fun AutoCompleteTextField(
     // des entrées de l'utilisateur.
     val suggestions = editViewModel.suggestions.collectAsState()
 
+    // Regroupe plusieurs états de valeur faisant parti du formulaire
+    val state = editViewModel.state.value
+
+    // Conditions pour ouvrir le menu déroulant
+    val showList = state.buttonCategoryPressed ||
+            (textFieldValue.text.isNotBlank() && suggestions.value.isNotEmpty())
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TextField(
-            value = textFieldValue,
-            onValueChange = { newValue ->
-                textFieldValue = newValue
-                editViewModel.onEvent(AddEditItemEvent.UpdateSuggestions(newValue.text))
-            },
-            placeholder = {
-                Text("Ton article est...")
-            },
-            singleLine = true,
-            modifier = modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .onFocusChanged {
-                    onFocusChange(it)
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = textFieldValue,
+                onValueChange = { newValue ->
+                    textFieldValue = newValue
+                    editViewModel.onEvent(AddEditItemEvent.UpdateSuggestions(newValue.text))
+                },
+                placeholder = {
+                    Text("Ton article est...")
+                },
+                singleLine = true,
+                modifier = modifier
+                    .weight(1f)
+                    .height(70.dp)
+                    .onFocusChanged {
+                        onFocusChange(it)
+                    },
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            editViewModel.onEvent(AddEditItemEvent.ShowCategoryList)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (showList) Icons.Outlined.ArrowDropDown else Icons.Outlined.ArrowDropUp,
+                            contentDescription = "Afficher toute la liste"
+                        )
+                    }
                 }
-        )
-        if (suggestions.value.isNotEmpty() && textFieldValue.text.isNotEmpty()) {
+
+            )
+        }
+
+        if (showList) {
             LazyColumn(
                 modifier = modifier
                     .fillMaxWidth()
@@ -94,7 +127,6 @@ fun AutoCompleteTextField(
                             }
                             .padding(10.dp)
                     )
-
                 }
             }
         }

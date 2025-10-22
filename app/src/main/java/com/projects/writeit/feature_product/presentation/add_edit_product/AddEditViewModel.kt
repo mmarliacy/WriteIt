@@ -1,5 +1,6 @@
 package com.projects.writeit.feature_product.presentation.add_edit_product
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -80,6 +81,11 @@ class AddEditViewModel @Inject constructor(
 
     private var fOriginalItem : Item? = null
 
+    // Pour vérifier
+    init {
+        Log.d("TEST", "Catégories initiales = ${Item.categories}")
+    }
+
     //---------------------------------------------------------------------------------------
     // -- VIEW MODEL FUNCTIONS -->
     //------------------------------------
@@ -121,7 +127,7 @@ class AddEditViewModel @Inject constructor(
     }
 
     fun initWithExistingProduct(pItem: Item) {
-        // stocke-le si nécessaire
+        // stock-le si nécessaire
         fOriginalItem = pItem
     }
 
@@ -238,22 +244,33 @@ class AddEditViewModel @Inject constructor(
                 if (!event.focusState.isFocused){
                     _suggestions.value = emptyList()
                 }
+
             }
 
             // -> Vide la liste des suggestions
             is AddEditItemEvent.ClearSuggestions -> {
                 _suggestions.value = emptyList()
+                _state.value = state.value.copy(buttonCategoryPressed = false)
             }
 
             // -> Met à jour la liste des suggestions en fonction des entrées utilisateur
             is AddEditItemEvent.UpdateSuggestions -> {
-                _suggestions.value = if (event.suggestion.isNotEmpty()) {
+                _state.value = state.value.copy(buttonCategoryPressed = false) // on ferme le mode dropdown
+                val query = event.query.trim()
+                _suggestions.value = if (query.isNotEmpty()) {
                     _categoryList.value.filter {
-                        it.contains(event.suggestion, ignoreCase = true)
+                        it.contains(query, ignoreCase = true)
                     }
                 } else {
                     emptyList()
                 }
+            }
+
+            // En activant ou l'inverse on affiche la liste complète des catégories
+            is AddEditItemEvent.ShowCategoryList -> {
+                val open = !state.value.buttonCategoryPressed
+                _state.value = state.value.copy(buttonCategoryPressed = open)
+                _suggestions.value = if (open) Item.categories else emptyList()
             }
 
             // Met à jour la catégorie dans l'item
