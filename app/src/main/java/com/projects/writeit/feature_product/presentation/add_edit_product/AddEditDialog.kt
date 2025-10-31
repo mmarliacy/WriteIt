@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,7 +32,7 @@ import com.projects.writeit.feature_product.presentation.add_edit_product.compon
 import com.projects.writeit.feature_product.presentation.add_edit_product.components.CustomTitle
 import com.projects.writeit.feature_product.presentation.add_edit_product.components.TransparentTextField
 import com.projects.writeit.feature_product.presentation.add_edit_product.util.AddEditItemEvent
-import com.projects.writeit.ui.theme.darkAccentColor
+import com.projects.writeit.ui.theme.AccentRed
 import com.projects.writeit.ui.theme.latoFamily
 import kotlinx.coroutines.flow.collectLatest
 
@@ -104,29 +103,79 @@ fun AddEditDialog(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 10.dp),
-        horizontalArrangement = Arrangement.Center,
+            .padding(start = 20.dp, bottom = 20.dp),
+        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.Top
     ) {
         CustomTitle(
-            title = "Ajoute ton produit",
+            title = "Je veux...",
             fontFamily = latoFamily,
             fontWeight = FontWeight.SemiBold,
-            size = 25.sp,
-            fontStyle = FontStyle.Normal
+            size = 20.sp,
+            fontStyle = FontStyle.Normal,
+            color = AccentRed
         )
     }
-    HorizontalDivider(
-        thickness = 0.5.dp,
-        color = darkAccentColor,
-        modifier = modifier.fillMaxWidth()
-    )
+
     Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(15.dp),
         modifier = Modifier
             .padding(15.dp)
     ) {
+        Row (
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ){
+            // -> Champ pour saisir la quantité.
+            TransparentTextField(
+                modifier = modifier.testTag("quantityText").weight(0.50f),
+                text = productQuantityState.quantityText,
+                hint = productQuantityState.hint,
+                onValueChange = { productQuantity ->
+                    editViewModel.onEvent(
+                        AddEditItemEvent.EnteredQuantity(
+                            productQuantity
+                        )
+                    )
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                onFocusChange = { productQuantity ->
+                    editViewModel.onEvent(
+                        AddEditItemEvent.ChangeQuantityFocus(
+                            productQuantity
+                        )
+                    )
+                },
+                isHintVisible = productQuantityState.isHintVisible,
+                isError = state.quantityError != null,
+                supportingErrorText = state.quantityError
+            )
+
+            // -> Champ pour saisir le type / le quantifieur
+            TransparentTextField(
+                modifier = modifier.weight(1.50f),
+                text = productQuantityState.quantityText, // changer en Quantifieur
+                hint = productQuantityState.hint,
+                onValueChange = { productQuantity ->
+                    editViewModel.onEvent(
+                        AddEditItemEvent.EnteredQuantity(
+                            productQuantity
+                        )
+                    )
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                onFocusChange = { productQuantity ->
+                    editViewModel.onEvent(
+                        AddEditItemEvent.ChangeQuantityFocus(
+                            productQuantity
+                        )
+                    )
+                },
+                isHintVisible = productQuantityState.isHintVisible,
+                isError = state.quantityError != null,
+                supportingErrorText = state.quantityError
+            )
+        }
 
         //---------------------------------------------------------------------------------------
         // -- CHAMPS DE TEXTE A REMPLIR OU SÉLECTIONNER -->
@@ -137,7 +186,7 @@ fun AddEditDialog(
         //------------------------------------
 
         TransparentTextField(
-            modifier = modifier.testTag("nameText"),
+            modifier = modifier.testTag("nameText").fillMaxWidth(),
             text = productNameState.nameText,
             hint = productNameState.hint,
             onValueChange = { productName ->
@@ -155,32 +204,6 @@ fun AddEditDialog(
         Spacer(
             modifier = Modifier.height(5.dp)
         )
-
-        // -> Champ pour saisir la quantité.
-        TransparentTextField(
-            modifier = modifier.testTag("quantityText"),
-            text = productQuantityState.quantityText,
-            hint = productQuantityState.hint,
-            onValueChange = { productQuantity ->
-                editViewModel.onEvent(
-                    AddEditItemEvent.EnteredQuantity(
-                        productQuantity
-                    )
-                )
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            onFocusChange = { productQuantity ->
-                editViewModel.onEvent(
-                    AddEditItemEvent.ChangeQuantityFocus(
-                        productQuantity
-                    )
-                )
-            },
-            isHintVisible = productQuantityState.isHintVisible,
-            isError = state.quantityError != null,
-            supportingErrorText = state.quantityError
-        )
-
 
         AutoCompleteTextField(
             modifier = Modifier,
@@ -214,13 +237,12 @@ fun AddEditDialog(
                 .padding(10.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
-        ) {
+        ){
 
             // -> Bouton "OK" personnalisé pour enregistrer le produit dans la base de données locale.
             CustomButton {
                 editViewModel.onEvent(AddEditItemEvent.SaveItem)
             }
-
         }
     }
 }

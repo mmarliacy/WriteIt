@@ -113,8 +113,8 @@ fun ProductsScreen(
 
     // -> Etat du conteneur de l'écran.
     val sheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.Hidden,   // ou PartiallyExpanded si tu préfères
-        skipHiddenState = false             // <— ici, pas dans rememberBottomSheetScaffoldState
+        initialValue = SheetValue.Hidden,
+        skipHiddenState = false
     )
 
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
@@ -192,6 +192,7 @@ fun ProductsScreen(
     // Il intègre également un snackbarHost pour l'affichage des messages utilisateur.
     Box(modifier = modifier.fillMaxSize()) {
         BottomSheetScaffold(
+            sheetContainerColor = White,
             scaffoldState = bottomSheetScaffoldState,
             snackbarHost = { SnackbarHost(hostState = bottomSheetScaffoldState.snackbarHostState) },
             // Barre supérieure de l’écran contenant le titre,

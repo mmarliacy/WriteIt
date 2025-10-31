@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -23,6 +24,7 @@ fun CustomTitle(
     size: TextUnit,
     fontStyle: FontStyle,
     fontWeight: FontWeight,
+    color : Color,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -33,7 +35,8 @@ fun CustomTitle(
             fontFamily = fontFamily,
             fontWeight = fontWeight,
             fontSize = size,
-            fontStyle = fontStyle
+            fontStyle = fontStyle,
+            color = color
         )
     }
 }

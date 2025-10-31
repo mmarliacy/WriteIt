@@ -60,7 +60,7 @@ class AddEditViewModel @Inject constructor(
     // -- Etat de la quantité du produit (modifiable + lecture seule).
     private val _productQuantity = mutableStateOf(
         ItemTextFieldState(
-            hint = "Combien... ?"
+            hint = "1,2,3..."
         )
     )
     val productQuantity: State<ItemTextFieldState> = _productQuantity
